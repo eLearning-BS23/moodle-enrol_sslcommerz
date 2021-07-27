@@ -37,7 +37,7 @@ use core_privacy\local\request\writer;
 /**
  * Privacy Subsystem implementation for enrol_sslcommerz.
  *
- * @copyright  2018 Shamim Rezaie <shamim@moodle.com>
+ * @copyright  2021 Brain station 23 ltd.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements
