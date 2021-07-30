@@ -15,21 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * PayPal enrolment plugin utility class.
+ * sslcommerz enrolment plugin utility class.
  *
- * @package    enrol_paypal
+ * @package    enrol_sslcommerz
  * @copyright  2016 Cameron Ball <cameron@cameron1729.xyz>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace enrol_paypal;
+namespace enrol_sslcommerz;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * PayPal enrolment plugin utility class.
+ * sslcommerz enrolment plugin utility class.
  *
- * @package   enrol_paypal
+ * @package   enrol_sslcommerz
  * @copyright 2016 Cameron Ball <cameron@cameron1729.xyz>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -39,9 +39,9 @@ final class util {
      * Alerts site admin of potential problems.
      *
      * @param string   $subject email subject
-     * @param stdClass $data    PayPal IPN data
+     * @param stdClass $data    sslcommerz IPN data
      */
-    public static function message_paypal_error_to_admin($subject, $data) {
+    public static function message_sslcommerz_error_to_admin($subject, $data) {
         $admin = get_admin();
         $site = get_site();
 
@@ -54,11 +54,11 @@ final class util {
         $eventdata = new \core\message\message();
         $eventdata->courseid          = empty($data->courseid) ? SITEID : $data->courseid;
         $eventdata->modulename        = 'moodle';
-        $eventdata->component         = 'enrol_paypal';
-        $eventdata->name              = 'paypal_enrolment';
+        $eventdata->component         = 'enrol_sslcommerz';
+        $eventdata->name              = 'sslcommerz_enrolment';
         $eventdata->userfrom          = $admin;
         $eventdata->userto            = $admin;
-        $eventdata->subject           = "PAYPAL ERROR: ".$subject;
+        $eventdata->subject           = "sslcommerz ERROR: ".$subject;
         $eventdata->fullmessage       = $message;
         $eventdata->fullmessageformat = FORMAT_PLAIN;
         $eventdata->fullmessagehtml   = '';
@@ -75,7 +75,7 @@ final class util {
         return function($ex) {
             $info = get_exception_info($ex);
 
-            $logerrmsg = "enrol_paypal IPN exception handler: ".$info->message;
+            $logerrmsg = "enrol_sslcommerz IPN exception handler: ".$info->message;
             if (debugging('', DEBUG_NORMAL)) {
                 $logerrmsg .= ' Debug: '.$info->debuginfo."\n".format_backtrace($info->backtrace, true);
             }

@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Listens for Instant Payment Notification from PayPal
+ * Listens for Instant Payment Notification from sslcommerz
  *
- * This script waits for Payment notification from PayPal,
- * then double checks that data by sending it back to PayPal.
- * If PayPal verifies this then it sets up the enrolment for that
+ * This script waits for Payment notification from sslcommerz,
+ * then double checks that data by sending it back to sslcommerz.
+ * If sslcommerz verifies this then it sets up the enrolment for that
  * user.
  *
- * @package    enrol_paypal
+ * @package    enrol_sslcommerz
  * @copyright 2010 Eugene Venter
  * @author     Eugene Venter - based on code by others
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -38,14 +38,14 @@ require_once("lib.php");
 require_once($CFG->libdir.'/enrollib.php');
 require_once($CFG->libdir . '/filelib.php');
 
-// PayPal does not like when we return error messages here,
+// sslcommerz does not like when we return error messages here,
 // the custom handler just logs exceptions and stops.
-set_exception_handler(\enrol_paypal\util::get_exception_handler());
+set_exception_handler(\enrol_sslcommerz\util::get_exception_handler());
 
 // Make sure we are enabled in the first place.
-if (!enrol_is_enabled('paypal')) {
+if (!enrol_is_enabled('sslcommerz')) {
     http_response_code(503);
-    throw new moodle_exception('errdisabled', 'enrol_paypal');
+    throw new moodle_exception('errdisabled', 'enrol_sslcommerz');
 }
 
 /// Keep out casual intruders
@@ -54,9 +54,9 @@ if (empty($_POST) or !empty($_GET)) {
     throw new moodle_exception('invalidrequest', 'core_error');
 }
 
-/// Read all the data from PayPal and get it ready for later;
+/// Read all the data from sslcommerz and get it ready for later;
 /// we expect only valid UTF-8 encoding, it is the responsibility
-/// of user to set it up properly in PayPal business account,
+/// of user to set it up properly in sslcommerz business account,
 /// it is documented in docs wiki.
 
 $req = 'cmd=_notify-validate';
@@ -98,23 +98,25 @@ $context = context_course::instance($course->id, MUST_EXIST);
 
 $PAGE->set_context($context);
 
-$plugin_instance = $DB->get_record("enrol", array("id" => $data->instanceid, "enrol" => "paypal", "status" => 0), "*", MUST_EXIST);
-$plugin = enrol_get_plugin('paypal');
+$plugin_instance = $DB->get_record("enrol", array("id" => $data->instanceid, "enrol" => "sslcommerz", "status" => 0), "*", MUST_EXIST);
+$plugin = enrol_get_plugin('sslcommerz');
+var_dump($plugin);
+die();
 
-/// Open a connection back to PayPal to validate the data
-$paypaladdr = empty($CFG->usepaypalsandbox) ? 'ipnpb.paypal.com' : 'ipnpb.sandbox.paypal.com';
+/// Open a connection back to sslcommerz to validate the data
+$sslcommerzaddr = empty($CFG->usesslcommerzsandbox) ? 'ipnpb.sslcommerz.com' : 'ipnpb.sandbox.sslcommerz.com';
 $c = new curl();
 $options = array(
     'returntransfer' => true,
-    'httpheader' => array('application/x-www-form-urlencoded', "Host: $paypaladdr"),
+    'httpheader' => array('application/x-www-form-urlencoded', "Host: $sslcommerzaddr"),
     'timeout' => 30,
     'CURLOPT_HTTP_VERSION' => CURL_HTTP_VERSION_1_1,
 );
-$location = "https://$paypaladdr/cgi-bin/webscr";
+$location = "https://$sslcommerzaddr/cgi-bin/webscr";
 $result = $c->post($location, $req, $options);
 
 if ($c->get_errno()) {
-    throw new moodle_exception('errpaypalconnect', 'enrol_paypal', '', array('url' => $paypaladdr, 'result' => $result),
+    throw new moodle_exception('errsslcommerzconnect', 'enrol_sslcommerz', '', array('url' => $sslcommerzaddr, 'result' => $result),
         json_encode($data));
 }
 
@@ -133,7 +135,7 @@ if (strlen($result) > 0) {
 
         if ($data->payment_status != "Completed" and $data->payment_status != "Pending") {
             $plugin->unenrol_user($plugin_instance, $data->userid);
-            \enrol_paypal\util::message_paypal_error_to_admin("Status not completed or pending. User unenrolled from course",
+            \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Status not completed or pending. User unenrolled from course",
                                                               $data);
             die;
         }
@@ -141,7 +143,7 @@ if (strlen($result) > 0) {
         // If currency is incorrectly set then someone maybe trying to cheat the system
 
         if ($data->mc_currency != $plugin_instance->currency) {
-            \enrol_paypal\util::message_paypal_error_to_admin(
+            \enrol_sslcommerz\util::message_sslcommerz_error_to_admin(
                 "Currency does not match course settings, received: ".$data->mc_currency,
                 $data);
             die;
@@ -154,23 +156,23 @@ if (strlen($result) > 0) {
             $eventdata = new \core\message\message();
             $eventdata->courseid          = empty($data->courseid) ? SITEID : $data->courseid;
             $eventdata->modulename        = 'moodle';
-            $eventdata->component         = 'enrol_paypal';
-            $eventdata->name              = 'paypal_enrolment';
+            $eventdata->component         = 'enrol_sslcommerz';
+            $eventdata->name              = 'sslcommerz_enrolment';
             $eventdata->userfrom          = get_admin();
             $eventdata->userto            = $user;
-            $eventdata->subject           = "Moodle: PayPal payment";
-            $eventdata->fullmessage       = "Your PayPal payment is pending.";
+            $eventdata->subject           = "Moodle: sslcommerz payment";
+            $eventdata->fullmessage       = "Your sslcommerz payment is pending.";
             $eventdata->fullmessageformat = FORMAT_PLAIN;
             $eventdata->fullmessagehtml   = '';
             $eventdata->smallmessage      = '';
             message_send($eventdata);
 
-            \enrol_paypal\util::message_paypal_error_to_admin("Payment pending", $data);
+            \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Payment pending", $data);
             die;
         }
 
         // If our status is not completed or not pending on an echeck clearance then ignore and die
-        // This check is redundant at present but may be useful if paypal extend the return codes in the future
+        // This check is redundant at present but may be useful if sslcommerz extend the return codes in the future
 
         if (! ( $data->payment_status == "Completed" or
                ($data->payment_status == "Pending" and $data->pending_reason == "echeck") ) ) {
@@ -180,8 +182,8 @@ if (strlen($result) > 0) {
         // At this point we only proceed with a status of completed or pending with a reason of echeck
 
         // Make sure this transaction doesn't exist already.
-        if ($existing = $DB->get_record("enrol_paypal", array("txn_id" => $data->txn_id), "*", IGNORE_MULTIPLE)) {
-            \enrol_paypal\util::message_paypal_error_to_admin("Transaction $data->txn_id is being repeated!", $data);
+        if ($existing = $DB->get_record("enrol_sslcommerz", array("txn_id" => $data->txn_id), "*", IGNORE_MULTIPLE)) {
+            \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Transaction $data->txn_id is being repeated!", $data);
             die;
         }
 
@@ -194,19 +196,19 @@ if (strlen($result) > 0) {
             $recipient = 'empty';
         }
 
-        if (core_text::strtolower($recipient) !== core_text::strtolower($plugin->get_config('paypalbusiness'))) {
-            \enrol_paypal\util::message_paypal_error_to_admin("Business email is {$recipient} (not ".
-                    $plugin->get_config('paypalbusiness').")", $data);
+        if (core_text::strtolower($recipient) !== core_text::strtolower($plugin->get_config('sslcommerzbusiness'))) {
+            \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Business email is {$recipient} (not ".
+                    $plugin->get_config('sslcommerzbusiness').")", $data);
             die;
         }
 
         if (!$user = $DB->get_record('user', array('id'=>$data->userid))) {   // Check that user exists
-            \enrol_paypal\util::message_paypal_error_to_admin("User $data->userid doesn't exist", $data);
+            \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("User $data->userid doesn't exist", $data);
             die;
         }
 
         if (!$course = $DB->get_record('course', array('id'=>$data->courseid))) { // Check that course exists
-            \enrol_paypal\util::message_paypal_error_to_admin("Course $data->courseid doesn't exist", $data);
+            \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Course $data->courseid doesn't exist", $data);
             die;
         }
 
@@ -223,7 +225,7 @@ if (strlen($result) > 0) {
         $cost = format_float($cost, 2, false);
 
         if ($data->payment_gross < $cost) {
-            \enrol_paypal\util::message_paypal_error_to_admin("Amount paid is not enough ($data->payment_gross < $cost))", $data);
+            \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Amount paid is not enough ($data->payment_gross < $cost))", $data);
             die;
 
         }
@@ -232,7 +234,7 @@ if (strlen($result) > 0) {
 
         // ALL CLEAR !
 
-        $DB->insert_record("enrol_paypal", $data);
+        $DB->insert_record("enrol_sslcommerz", $data);
 
         if ($plugin_instance->enrolperiod) {
             $timestart = time();
@@ -268,8 +270,8 @@ if (strlen($result) > 0) {
             $eventdata = new \core\message\message();
             $eventdata->courseid          = $course->id;
             $eventdata->modulename        = 'moodle';
-            $eventdata->component         = 'enrol_paypal';
-            $eventdata->name              = 'paypal_enrolment';
+            $eventdata->component         = 'enrol_sslcommerz';
+            $eventdata->name              = 'sslcommerz_enrolment';
             $eventdata->userfrom          = empty($teacher) ? core_user::get_noreply_user() : $teacher;
             $eventdata->userto            = $user;
             $eventdata->subject           = get_string("enrolmentnew", 'enrol', $shortname);
@@ -288,8 +290,8 @@ if (strlen($result) > 0) {
             $eventdata = new \core\message\message();
             $eventdata->courseid          = $course->id;
             $eventdata->modulename        = 'moodle';
-            $eventdata->component         = 'enrol_paypal';
-            $eventdata->name              = 'paypal_enrolment';
+            $eventdata->component         = 'enrol_sslcommerz';
+            $eventdata->name              = 'sslcommerz_enrolment';
             $eventdata->userfrom          = $user;
             $eventdata->userto            = $teacher;
             $eventdata->subject           = get_string("enrolmentnew", 'enrol', $shortname);
@@ -308,8 +310,8 @@ if (strlen($result) > 0) {
                 $eventdata = new \core\message\message();
                 $eventdata->courseid          = $course->id;
                 $eventdata->modulename        = 'moodle';
-                $eventdata->component         = 'enrol_paypal';
-                $eventdata->name              = 'paypal_enrolment';
+                $eventdata->component         = 'enrol_sslcommerz';
+                $eventdata->name              = 'sslcommerz_enrolment';
                 $eventdata->userfrom          = $user;
                 $eventdata->userto            = $admin;
                 $eventdata->subject           = get_string("enrolmentnew", 'enrol', $shortname);
@@ -322,7 +324,7 @@ if (strlen($result) > 0) {
         }
 
     } else if (strcmp ($result, "INVALID") == 0) { // ERROR
-        $DB->insert_record("enrol_paypal", $data, false);
-        throw new moodle_exception('erripninvalid', 'enrol_paypal', '', null, json_encode($data));
+        $DB->insert_record("enrol_sslcommerz", $data, false);
+        throw new moodle_exception('erripninvalid', 'enrol_sslcommerz', '', null, json_encode($data));
     }
 }
