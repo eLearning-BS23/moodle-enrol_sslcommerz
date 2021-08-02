@@ -43,10 +43,10 @@ $post_data['cus_fax'] = "";
 // $post_data['ship_country'] = "Bangladesh";
 
 # OPTIONAL PARAMETERS
-// $post_data['value_a'] = "ref001";
-// $post_data['value_b '] = "ref002";
-// $post_data['value_c'] = "ref003";
-// $post_data['value_d'] = "ref004";
+ $post_data['value_a'] = $_POST['custom'];
+ $post_data['value_b '] = "ref002";
+ $post_data['value_c'] = "ref003";
+ $post_data['value_d'] = "ref004";
 
 # CART PARAMETERS
 // $post_data['cart'] = json_encode(array(

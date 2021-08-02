@@ -28,40 +28,40 @@ $code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 
 if($code == 200 && !( curl_errno($handle)))
 {
-	# TO CONVERT AS ARRAY
-	# $result = json_decode($result, true);
-	# $status = $result['status'];
+    # TO CONVERT AS ARRAY
+    # $result = json_decode($result, true);
+    # $status = $result['status'];
 
-	# TO CONVERT AS OBJECT
-	$result = json_decode($result);
+    # TO CONVERT AS OBJECT
+    $result = json_decode($result);
 
-	# TRANSACTION INFO
-	$status = $result->status;
-	$tran_date = $result->tran_date;
-	$tran_id = $result->tran_id;
-	$val_id = $result->val_id;
-	$amount = $result->amount;
-	$store_amount = $result->store_amount;
-	$bank_tran_id = $result->bank_tran_id;
-	$card_type = $result->card_type;
+    # TRANSACTION INFO
+    $status = $result->status;
+    $tran_date = $result->tran_date;
+    $tran_id = $result->tran_id;
+    $val_id = $result->val_id;
+    $amount = $result->amount;
+    $store_amount = $result->store_amount;
+    $bank_tran_id = $result->bank_tran_id;
+    $card_type = $result->card_type;
 
-	# EMI INFO
-	// $emi_ instalment = $result->emi_instalment;
-	// $emi_ amount = $result->emi_ amount;
-	// $emi_description = $result->emi_description;
-	// $emi_issuer = $result->emi_issuer;
+    # EMI INFO
+    // $emi_ instalment = $result->emi_instalment;
+    // $emi_ amount = $result->emi_ amount;
+    // $emi_description = $result->emi_description;
+    // $emi_issuer = $result->emi_issuer;
 
-	# ISSUER INFO
-	$card_no = $result->card_no;
-	$card_issuer = $result->card_issuer;
-	$card_brand = $result->card_brand;
-	$card_issuer_country = $result->card_issuer_country;
-	$card_issuer_country_code = $result->card_issuer_country_code;
+    # ISSUER INFO
+    $card_no = $result->card_no;
+    $card_issuer = $result->card_issuer;
+    $card_brand = $result->card_brand;
+    $card_issuer_country = $result->card_issuer_country;
+    $card_issuer_country_code = $result->card_issuer_country_code;
 
-	# API AUTHENTICATION
-	$APIConnect = $result->APIConnect;
-	$validated_on = $result->validated_on;
-	$gw_version = $result->gw_version;
+    # API AUTHENTICATION
+    $APIConnect = $result->APIConnect;
+    $validated_on = $result->validated_on;
+    $gw_version = $result->gw_version;
 
 // ALL CLEAR !
 
@@ -89,6 +89,7 @@ if($code == 200 && !( curl_errno($handle)))
     $data->userid           = (int)$userId;
     $data->courseid         = (int)$id;
     $data->instanceid       = (int)$instanceId;
+    $data->mc_currency       = $_POST['currency_type'];
     $data->timeupdated      = time();
 
 
@@ -101,8 +102,7 @@ if($code == 200 && !( curl_errno($handle)))
 
     $plugin = enrol_get_plugin('sslcommerz');
 
-
-    if (strcmp($status, "VALIDATED") == 0) {          // VALID PAYMENT!
+    if (strcmp($status, "VALID") == 0) {          // VALID PAYMENT!
 
         // check the payment_status and payment_reason
 
@@ -121,24 +121,24 @@ if($code == 200 && !( curl_errno($handle)))
         // If status is pending and reason is other than echeck then we are on hold until further notice
         // Email user to let them know. Email admin.
 
-        if ($data->payment_status == "Pending" and $data->pending_reason != "echeck") {
-            $eventdata = new \core\message\message();
-            $eventdata->courseid          = empty($data->courseid) ? SITEID : $data->courseid;
-            $eventdata->modulename        = 'moodle';
-            $eventdata->component         = 'enrol_sslcommerz';
-            $eventdata->name              = 'sslcommerz_enrolment';
-            $eventdata->userfrom          = get_admin();
-            $eventdata->userto            = $user;
-            $eventdata->subject           = "Moodle: sslcommerz payment";
-            $eventdata->fullmessage       = "Your sslcommerz payment is pending.";
-            $eventdata->fullmessageformat = FORMAT_PLAIN;
-            $eventdata->fullmessagehtml   = '';
-            $eventdata->smallmessage      = '';
-            message_send($eventdata);
-
-            \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Payment pending", $data);
-            die;
-        }
+//        if ($data->payment_status == "Pending" and $data->pending_reason != "echeck") {
+//            $eventdata = new \core\message\message();
+//            $eventdata->courseid          = empty($data->courseid) ? SITEID : $data->courseid;
+//            $eventdata->modulename        = 'moodle';
+//            $eventdata->component         = 'enrol_sslcommerz';
+//            $eventdata->name              = 'sslcommerz_enrolment';
+//            $eventdata->userfrom          = get_admin();
+//            $eventdata->userto            = $user;
+//            $eventdata->subject           = "Moodle: sslcommerz payment";
+//            $eventdata->fullmessage       = "Your sslcommerz payment is pending.";
+//            $eventdata->fullmessageformat = FORMAT_PLAIN;
+//            $eventdata->fullmessagehtml   = '';
+//            $eventdata->smallmessage      = '';
+//            message_send($eventdata);
+//
+//            \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Payment pending", $data);
+//            die;
+//        }
 
         // If our status is not completed or not pending on an echeck clearance then ignore and die
         // This check is redundant at present but may be useful if sslcommerz extend the return codes in the future
@@ -164,6 +164,7 @@ if($code == 200 && !( curl_errno($handle)))
         } else {
             $recipient = 'empty';
         }
+
 
 //        if (core_text::strtolower($recipient) !== core_text::strtolower($plugin->get_config('sslcommerzbusiness'))) {
 //            \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Business email is {$recipient} (not ".
@@ -191,17 +192,12 @@ if($code == 200 && !( curl_errno($handle)))
         }
 
         // Use the same rounding of floats as on the enrol form.
-        $cost = format_float($cost, 2, false);
-
-//        if ($data->payment_gross < $cost) {
-//            \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Amount paid is not enough ($data->payment_gross < $cost))", $data);
-//            die;
-//
-//        }
         // Use the queried course's full name for the item_name field.
         $data->item_name = $course->fullname;
 
         // ALL CLEAR !
+
+        $cost = format_float($cost, 2, false);
 
         $DB->insert_record("enrol_sslcommerz", $data);
         if ($plugin_instance->enrolperiod) {
@@ -290,12 +286,21 @@ if($code == 200 && !( curl_errno($handle)))
                 message_send($eventdata);
             }
         }
-        $url = $CFG->wwwroot."/enrol/sslcommerz/success.php?id=".$_POST['course_id'];
-        redirect($url, 'optional message', 10);
+
+
+        if (!empty($SESSION->wantsurl)) {
+            $destination = $SESSION->wantsurl;
+            unset($SESSION->wantsurl);
+        } else {
+            $destination = "$CFG->wwwroot/course/view.php?id=$course->id";
+        }
+
+        $fullname = format_string($course->fullname, true, array('context' => $context));
+
+        redirect($destination, get_string('paymentthanks', '', $fullname));
+
     }
 }
 else {
-	echo "Failed to connect with SSLCOMMERZ";
+    echo "Failed to connect with SSLCOMMERZ";
 }
-
-
