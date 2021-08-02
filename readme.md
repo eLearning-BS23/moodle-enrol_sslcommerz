@@ -41,15 +41,17 @@ You can download zip file and install or you can put file under enrol as sslcomm
 <img src="https://i.imgur.com/4fpLrUh.png?1" width="80%">
 </p>
 
-> Now go to your course settings
+## Enrolment settings: 
+- Login as a course adminstrator.
+-Go to your course settings
 ```
-  Dashboard->Courses->pc01->Users->Enrolment methods settings
+  Dashboard->Courses->Course->Users->Enrolment methods settings
 ```
 <p align="center">
 <img src="https://i.imgur.com/LCsYjte.png?1" width="40%">
 </p>
 
-> Then add price for that course
+- Add price and other required information. 
 ```
 Dashboard->Courses->pc01->Users->Enrolment methods->SSLCOMMERZ settings
 ```
