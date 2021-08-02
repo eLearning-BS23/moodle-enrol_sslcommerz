@@ -32,9 +32,9 @@ if ($ADMIN->fulltree) {
 
     $settings->add(new admin_setting_configtext('enrol_sslcommerz/sslcommerzbusiness', get_string('businessemail', 'enrol_sslcommerz'), get_string('businessemail_desc', 'enrol_sslcommerz'), '', PARAM_EMAIL));
 
-    $settings->add(new admin_setting_configtext('enrol_sslcommerz/sslstoreid', get_string('storeid', 'enrol_sslcommerz'), get_string('businessstoreid_desc', 'enrol_sslcommerz'), '', PARAM_TEXT));
+    $settings->add(new admin_setting_configtext('enrol_sslcommerz/sslstoreid', get_string('businessstoreid', 'enrol_sslcommerz'), get_string('businessstoreid_desc', 'enrol_sslcommerz'), '', PARAM_TEXT));
 
-    $settings->add(new admin_setting_configtext('enrol_sslcommerz/sslstorepassword', get_string('storepassword', 'enrol_sslcommerz'), get_string('businessstorepassword_desc', 'enrol_sslcommerz'), '', PARAM_TEXT));
+    $settings->add(new admin_setting_configtext('enrol_sslcommerz/sslstorepassword', get_string('businessstorepassword', 'enrol_sslcommerz'), get_string('businessstorepassword_desc', 'enrol_sslcommerz'), '', PARAM_TEXT));
 
     $settings->add(new admin_setting_configcheckbox('enrol_sslcommerz/mailstudents', get_string('mailstudents', 'enrol_sslcommerz'), '', 0));
 
