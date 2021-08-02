@@ -43,7 +43,10 @@ You can download zip file and install or you can put file under enrol as sslcomm
 
 ## Enrolment settings: 
 - Login as a course adminstrator.
--Go to your course settings
+- Enable enrol sslcommerz plugin. 
+- Go to your course settings
+-  Choose `sslcommerz` from `Add method` option
+
 ```
   Dashboard->Courses->Course->Users->Enrolment methods settings
 ```
@@ -51,7 +54,9 @@ You can download zip file and install or you can put file under enrol as sslcomm
 <img src="https://i.imgur.com/LCsYjte.png?1" width="40%">
 </p>
 
-- Add price and other required information. 
+- Add price and other required informations. 
+- Save changes.
+- That's it. and you are done!
 ```
 Dashboard->Courses->pc01->Users->Enrolment methods->SSLCOMMERZ settings
 ```
