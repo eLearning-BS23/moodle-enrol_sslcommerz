@@ -3,13 +3,14 @@ require("../../config.php");
 
 global $CFG, $USER;
 /* PHP */
+
 $post_data = array();
 $post_data['store_id'] = get_config('enrol_sslcommerz')->sslstoreid;
 $post_data['store_passwd'] = get_config('enrol_sslcommerz')->sslstorepassword;
 $post_data['total_amount'] = $_POST['amount'];
 $post_data['currency'] = "BDT";
 $post_data['tran_id'] = "SSLCZ_TEST_".uniqid();
-$post_data['success_url'] = $CFG->wwwroot."/enrol/sslcommerz/return.php?id=".$_POST['course_id'];
+$post_data['success_url'] = $CFG->wwwroot."/enrol/sslcommerz/return.php?id=".$_POST['course_id']."&user_id=".$_POST['user_id']."&instance=".$_POST['instance_id'];
 $post_data['fail_url'] = $CFG->wwwroot."/enrol/sslcommerz/fail.php";
 $post_data['cancel_url'] = $CFG->wwwroot."/enrol/sslcommerz/cancel.php";
 $post_data['ipn_url'] = $CFG->wwwroot."/enrol/sslcommerz/ipn.php";

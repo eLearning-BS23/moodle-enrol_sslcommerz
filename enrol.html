@@ -20,6 +20,8 @@
 <input type="hidden" name="on0" value="<?php print_string("user") ?>" />
 <input type="hidden" name="os0" value="<?php p($userfullname) ?>" />
 <input type="hidden" name="course_id" value="<?php echo $course->id; ?>" />
+<input type="hidden" name="user_id" value="<?php echo $USER->id; ?>" />
+<input type="hidden" name="instance_id" value="<?php echo $instance->id; ?>" />
 <input type="hidden" name="custom" value="<?php echo "{$USER->id}-{$course->id}-{$instance->id}" ?>" />
 
 <input type="hidden" name="currency_code" value="<?php p($instance->currency) ?>" />
@@ -41,5 +43,4 @@
 <input type="submit" value="<?php print_string("sendpaymentbutton", "enrol_sslcommerz") ?>" />
 
 </form>
-
 </div>
