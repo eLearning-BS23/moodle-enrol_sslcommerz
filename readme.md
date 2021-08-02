@@ -1,6 +1,8 @@
-# Moodle Sslcommerz
+# Moodle Enrol Sslcommerz plugin
 
-Moodle Sslcommerz is a enroll plugin to help students to pay BDT. It support all banks and online mobile transaction.
+SSLCOMMERZ is the largest payment gateway aggregator in Bangladesh and a pioneer in the FinTech industry. For more detail about `SSLCOMMERZ` please visit https://www.sslcommerz.com/.
+
+Moodle Enrol Sslcommerz is a Moodle enrollment plugin based on `SSLCOMMERZ` gateway that help students to pay with Bangladeshi currency. It supports all Banks and online mobile transaction.
 
 <p align="center">
 <img src="https://i.imgur.com/mYH9uNd.png?1">
@@ -8,9 +10,13 @@ Moodle Sslcommerz is a enroll plugin to help students to pay BDT. It support all
 
 
 ## Features
-- Support all bangladeshi bank
-- Support All Bangladeshi Mobile banking
-- Easy to pay Bangladeshi Currency
+- Support all Bangladeshi Bank 
+- Support All Bangladeshi Mobile Banking
+- Multi-currency support.
+- Easy Integration
+- Personalised payment experience
+- Secure OTP based access to save cards
+- Bi-lingual Support
 
 
 ## Configuration
@@ -19,7 +25,7 @@ You can install this plugin from [Moodle plugins directory](https://moodle.org/p
 
 You can download zip file and install or you can put file under enrol as sslcommerz
 
-> After installing the plugin, you can use the plugin by following:
+## Plugin settings
 
 - Insert the Store id that provided by sslcommerz
 - Insert Store Password provided by sslcommerz
