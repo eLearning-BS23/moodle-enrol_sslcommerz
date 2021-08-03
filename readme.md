@@ -1,6 +1,8 @@
-# Moodle Sslcommerz
+# Moodle Enrol Sslcommerz plugin
 
-Moodle Sslcommerz is a enroll plugin to help students to pay BDT. It support all banks and online mobile transaction.
+SSLCOMMERZ is the largest payment gateway aggregator in Bangladesh and a pioneer in the FinTech industry. For more detail about `SSLCOMMERZ` please visit https://www.sslcommerz.com/.
+
+Moodle Enrol Sslcommerz is a Moodle enrollment plugin based on `SSLCOMMERZ` gateway that help students to pay with Bangladeshi currency. It supports all Banks and online mobile transaction.
 
 <p align="center">
 <img src="https://i.imgur.com/mYH9uNd.png?1">
@@ -8,9 +10,13 @@ Moodle Sslcommerz is a enroll plugin to help students to pay BDT. It support all
 
 
 ## Features
-- Support all bangladeshi bank
-- Support All Bangladeshi Mobile banking
-- Easy to pay Bangladeshi Currency
+- Support all Bangladeshi Bank 
+- Support All Bangladeshi Mobile Banking
+- Multi-currency support.
+- Easy Integration
+- Personalised payment experience
+- Secure OTP based access to save cards
+- Bi-lingual Support
 
 
 ## Configuration
@@ -19,7 +25,7 @@ You can install this plugin from [Moodle plugins directory](https://moodle.org/p
 
 You can download zip file and install or you can put file under enrol as sslcommerz
 
-> After installing the plugin, you can use the plugin by following:
+## Plugin settings
 
 - Insert the Store id that provided by sslcommerz
 - Insert Store Password provided by sslcommerz
@@ -35,15 +41,22 @@ You can download zip file and install or you can put file under enrol as sslcomm
 <img src="https://i.imgur.com/4fpLrUh.png?1" width="80%">
 </p>
 
-> Now go to your course settings
+## Enrolment settings: 
+- Login as a course adminstrator.
+- Enable enrol sslcommerz plugin. 
+- Go to your course settings
+-  Choose `sslcommerz` from `Add method` option
+
 ```
-  Dashboard->Courses->pc01->Users->Enrolment methods settings
+  Dashboard->Courses->Course->Users->Enrolment methods settings
 ```
 <p align="center">
 <img src="https://i.imgur.com/LCsYjte.png?1" width="40%">
 </p>
 
-> Then add price for that course
+- Add price and other required informations. 
+- Save changes.
+- That's it. and you are done!
 ```
 Dashboard->Courses->pc01->Users->Enrolment methods->SSLCOMMERZ settings
 ```
