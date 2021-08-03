@@ -7,7 +7,8 @@ require_once("$CFG->dirroot/enrol/sslcommerz/lib.php");
 
 global $CFG, $USER;
 /* PHP */
-
+var_dump($_POST);
+die();
 $val_id = urlencode($_POST['val_id']);
 $store_id = urlencode(get_config('enrol_sslcommerz')->sslstoreid);
 $store_passwd = urlencode(get_config('enrol_sslcommerz')->sslstorepassword);
