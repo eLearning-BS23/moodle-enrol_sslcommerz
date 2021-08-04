@@ -33,6 +33,18 @@ You can download zip file and install or you can put file under enrol as sslcomm
 - Insert Store Password provided by sslcommerz
 - Done!
 
+Login your sslcommerz account 
+```
+  My Stores->IPN Settings
+```
+then update the IPN at HTTP Listener
+- http://site-name/enrol/sslcommerz/return.php
+<p align="center">
+<img src="https://i.imgur.com/DmqB6SW.png?1">
+</p>
+
+  
+
 <p align="center">
 <img src="https://i.imgur.com/4TrsLso.png?1">
 </p>
