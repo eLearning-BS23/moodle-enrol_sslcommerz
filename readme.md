@@ -2,7 +2,7 @@
 
 SSLCOMMERZ is the largest payment gateway aggregator in Bangladesh and a pioneer in the FinTech industry. For more detail about `SSLCOMMERZ` please visit https://www.sslcommerz.com/.
 
-Moodle Enrol Sslcommerz is a Moodle enrollment plugin based on `SSLCOMMERZ` gateway that help students to pay with Bangladeshi currency. It supports all Banks and online mobile transaction.
+Moodle Enrol Sslcommerz is a Moodle enrollment plugin based on `SSLCOMMERZ` payment gateway that help students to pay with Bangladeshi currency. It supports all Bangladeshi Banks and online mobile transaction.
 
 <p align="center">
 <img src="https://i.imgur.com/mYH9uNd.png?1">
@@ -12,7 +12,6 @@ Moodle Enrol Sslcommerz is a Moodle enrollment plugin based on `SSLCOMMERZ` gate
 ## Features
 - Support all Bangladeshi Bank 
 - Support All Bangladeshi Mobile Banking
-- Multi-currency support.
 - Easy Integration
 - Personalised payment experience
 - Secure OTP based access to save cards
