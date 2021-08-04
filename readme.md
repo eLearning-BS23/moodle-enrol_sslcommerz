@@ -24,14 +24,15 @@ You can install this plugin from [Moodle plugins directory](https://moodle.org/p
 
 You can download zip file and install or you can put file under enrol as sslcommerz
 
-## Plugin settings
-
-- Insert the Store id that provided by sslcommerz
-- Insert Store Password provided by sslcommerz
-- Done!
+## Plugin Global Settings
+### Go to 
 ```
   Dashboard->Site administration->Plugins->Enrolments->sslcommerz settings
 ```
+- Insert the Store id that provided by sslcommerz
+- Insert Store Password provided by sslcommerz
+- Done!
+
 <p align="center">
 <img src="https://i.imgur.com/4TrsLso.png?1">
 </p>
@@ -43,23 +44,27 @@ You can download zip file and install or you can put file under enrol as sslcomm
 ## Enrolment settings: 
 - Login as a course adminstrator.
 - Enable enrol sslcommerz plugin. 
-- Go to your course settings
--  Choose `sslcommerz` from `Add method` option
+- Go to your course settings from 
 
 ```
   Dashboard->Courses->Course->Users->Enrolment methods settings
 ```
+-  Choose `sslcommerz` from `Add method` option
+
+
 <p align="center">
 <img src="https://i.imgur.com/LCsYjte.png?1" width="40%">
 </p>
 
 - Add price and other required informations. 
-- Save changes.
-- That's it. and you are done!
 ```
-Dashboard->Courses->pc01->Users->Enrolment methods->SSLCOMMERZ settings
+Dashboard->Courses->Course->Users->Enrolment methods->SSLCOMMERZ settings
 ```
 <p align="center">
 <img src="https://i.imgur.com/AzKUNpK.png?1">
 </p>
+
+- Save changes.
+- That's it. and you are done!
+- Enjoy the plugin!
 
