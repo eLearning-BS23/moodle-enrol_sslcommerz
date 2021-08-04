@@ -100,8 +100,6 @@ $PAGE->set_context($context);
 
 $plugin_instance = $DB->get_record("enrol", array("id" => $data->instanceid, "enrol" => "sslcommerz", "status" => 0), "*", MUST_EXIST);
 $plugin = enrol_get_plugin('sslcommerz');
-var_dump($plugin);
-die();
 
 /// Open a connection back to sslcommerz to validate the data
 $sslcommerzaddr = empty($CFG->usesslcommerzsandbox) ? 'ipnpb.sslcommerz.com' : 'ipnpb.sandbox.sslcommerz.com';
