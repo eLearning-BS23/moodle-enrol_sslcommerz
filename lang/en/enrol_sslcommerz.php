@@ -25,7 +25,11 @@
 
 $string['assignrole'] = 'Assign role';
 $string['businessemail'] = 'sslcommerz business email';
+$string['businessstoreid'] = 'Store Id';
+$string['businessstorepassword'] = 'Store Password';
 $string['businessemail_desc'] = 'The email address of your business sslcommerz account';
+$string['businessstoreid_desc'] = 'The Store Id Provided from sslcommerz';
+$string['businessstorepassword_desc'] = 'The Store Password Provided from sslcommerz';
 $string['cost'] = 'Enrol cost';
 $string['costerror'] = 'The enrolment cost is not numeric';
 $string['costorkey'] = 'Please choose one of the following methods of enrolment.';

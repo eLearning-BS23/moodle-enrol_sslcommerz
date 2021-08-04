@@ -44,7 +44,7 @@ class provider implements
         // Transactions store user data.
         \core_privacy\local\metadata\provider,
 
-        // The paypal enrolment plugin contains user's transactions.
+        // The sslcommerz enrolment plugin contains user's transactions.
         \core_privacy\local\request\plugin\provider,
 
         // This plugin is capable of determining which users have data within it.
@@ -58,18 +58,18 @@ class provider implements
      */
     public static function get_metadata(collection $collection) : collection {
         $collection->add_external_location_link(
-            'paypal.com',
+            'sslcommerz.com',
             [
-                'os0'        => 'privacy:metadata:enrol_sslcommerz:paypal_com:os0',
-                'custom'     => 'privacy:metadata:enrol_sslcommerz:paypal_com:custom',
-                'first_name' => 'privacy:metadata:enrol_sslcommerz:paypal_com:first_name',
-                'last_name'  => 'privacy:metadata:enrol_sslcommerz:paypal_com:last_name',
-                'address'    => 'privacy:metadata:enrol_sslcommerz:paypal_com:address',
-                'city'       => 'privacy:metadata:enrol_sslcommerz:paypal_com:city',
-                'email'      => 'privacy:metadata:enrol_sslcommerz:paypal_com:email',
-                'country'    => 'privacy:metadata:enrol_sslcommerz:paypal_com:country',
+                'os0'        => 'privacy:metadata:enrol_sslcommerz:sslcommerz_com:os0',
+                'custom'     => 'privacy:metadata:enrol_sslcommerz:sslcommerz_com:custom',
+                'first_name' => 'privacy:metadata:enrol_sslcommerz:sslcommerz_com:first_name',
+                'last_name'  => 'privacy:metadata:enrol_sslcommerz:sslcommerz_com:last_name',
+                'address'    => 'privacy:metadata:enrol_sslcommerz:sslcommerz_com:address',
+                'city'       => 'privacy:metadata:enrol_sslcommerz:sslcommerz_com:city',
+                'email'      => 'privacy:metadata:enrol_sslcommerz:sslcommerz_com:email',
+                'country'    => 'privacy:metadata:enrol_sslcommerz:sslcommerz_com:country',
             ],
-            'privacy:metadata:enrol_sslcommerz:paypal_com'
+            'privacy:metadata:enrol_sslcommerz:sslcommerz_com'
         );
 
         // The enrol_sslcommerz has a DB table that contains user data.
@@ -109,7 +109,7 @@ class provider implements
     public static function get_contexts_for_userid(int $userid) : contextlist {
         $contextlist = new contextlist();
 
-        // Values of ep.receiver_email and ep.business are already normalised to lowercase characters by PayPal,
+        // Values of ep.receiver_email and ep.business are already normalised to lowercase characters by sslcommerz,
         // therefore there is no need to use LOWER() on them in the following query.
         $sql = "SELECT ctx.id
                   FROM {enrol_sslcommerz} ep
@@ -139,7 +139,7 @@ class provider implements
             return;
         }
 
-        // Values of ep.receiver_email and ep.business are already normalised to lowercase characters by PayPal,
+        // Values of ep.receiver_email and ep.business are already normalised to lowercase characters by sslcommerz,
         // therefore there is no need to use LOWER() on them in the following query.
         $sql = "SELECT u.id
                   FROM {enrol_sslcommerz} ep
@@ -167,7 +167,7 @@ class provider implements
 
         list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
 
-        // Values of ep.receiver_email and ep.business are already normalised to lowercase characters by PayPal,
+        // Values of ep.receiver_email and ep.business are already normalised to lowercase characters by sslcommerz,
         // therefore there is no need to use LOWER() on them in the following query.
         $sql = "SELECT ep.*
                   FROM {enrol_sslcommerz} ep
@@ -185,17 +185,17 @@ class provider implements
         $params += $contextparams;
 
         // Reference to the course seen in the last iteration of the loop. By comparing this with the current record, and
-        // because we know the results are ordered, we know when we've moved to the PayPal transactions for a new course
+        // because we know the results are ordered, we know when we've moved to the sslcommerz transactions for a new course
         // and therefore when we can export the complete data for the last course.
         $lastcourseid = null;
 
         $strtransactions = get_string('transactions', 'enrol_sslcommerz');
         $transactions = [];
-        $paypalrecords = $DB->get_recordset_sql($sql, $params);
-        foreach ($paypalrecords as $paypalrecord) {
-            if ($lastcourseid != $paypalrecord->courseid) {
+        $sslcommerzrecords = $DB->get_recordset_sql($sql, $params);
+        foreach ($sslcommerzrecords as $sslcommerzrecord) {
+            if ($lastcourseid != $sslcommerzrecord->courseid) {
                 if (!empty($transactions)) {
-                    $coursecontext = \context_course::instance($paypalrecord->courseid);
+                    $coursecontext = \context_course::instance($sslcommerzrecord->courseid);
                     writer::with_context($coursecontext)->export_data(
                             [$strtransactions],
                             (object) ['transactions' => $transactions]
@@ -205,42 +205,42 @@ class provider implements
             }
 
             $transaction = (object) [
-                'receiver_id'         => $paypalrecord->receiver_id,
-                'item_name'           => $paypalrecord->item_name,
-                'userid'              => $paypalrecord->userid,
-                'memo'                => $paypalrecord->memo,
-                'tax'                 => $paypalrecord->tax,
-                'option_name1'        => $paypalrecord->option_name1,
-                'option_selection1_x' => $paypalrecord->option_selection1_x,
-                'option_name2'        => $paypalrecord->option_name2,
-                'option_selection2_x' => $paypalrecord->option_selection2_x,
-                'payment_status'      => $paypalrecord->payment_status,
-                'pending_reason'      => $paypalrecord->pending_reason,
-                'reason_code'         => $paypalrecord->reason_code,
-                'txn_id'              => $paypalrecord->txn_id,
-                'parent_txn_id'       => $paypalrecord->parent_txn_id,
-                'payment_type'        => $paypalrecord->payment_type,
-                'timeupdated'         => \core_privacy\local\request\transform::datetime($paypalrecord->timeupdated),
+                'receiver_id'         => $sslcommerzrecord->receiver_id,
+                'item_name'           => $sslcommerzrecord->item_name,
+                'userid'              => $sslcommerzrecord->userid,
+                'memo'                => $sslcommerzrecord->memo,
+                'tax'                 => $sslcommerzrecord->tax,
+                'option_name1'        => $sslcommerzrecord->option_name1,
+                'option_selection1_x' => $sslcommerzrecord->option_selection1_x,
+                'option_name2'        => $sslcommerzrecord->option_name2,
+                'option_selection2_x' => $sslcommerzrecord->option_selection2_x,
+                'payment_status'      => $sslcommerzrecord->payment_status,
+                'pending_reason'      => $sslcommerzrecord->pending_reason,
+                'reason_code'         => $sslcommerzrecord->reason_code,
+                'txn_id'              => $sslcommerzrecord->txn_id,
+                'parent_txn_id'       => $sslcommerzrecord->parent_txn_id,
+                'payment_type'        => $sslcommerzrecord->payment_type,
+                'timeupdated'         => \core_privacy\local\request\transform::datetime($sslcommerzrecord->timeupdated),
             ];
-            if ($paypalrecord->userid == $user->id) {
-                $transaction->userid = $paypalrecord->userid;
+            if ($sslcommerzrecord->userid == $user->id) {
+                $transaction->userid = $sslcommerzrecord->userid;
             }
-            if ($paypalrecord->business == \core_text::strtolower($user->email)) {
-                $transaction->business = $paypalrecord->business;
+            if ($sslcommerzrecord->business == \core_text::strtolower($user->email)) {
+                $transaction->business = $sslcommerzrecord->business;
             }
-            if ($paypalrecord->receiver_email == \core_text::strtolower($user->email)) {
-                $transaction->receiver_email = $paypalrecord->receiver_email;
+            if ($sslcommerzrecord->receiver_email == \core_text::strtolower($user->email)) {
+                $transaction->receiver_email = $sslcommerzrecord->receiver_email;
             }
 
-            $transactions[] = $paypalrecord;
+            $transactions[] = $sslcommerzrecord;
 
-            $lastcourseid = $paypalrecord->courseid;
+            $lastcourseid = $sslcommerzrecord->courseid;
         }
-        $paypalrecords->close();
+        $sslcommerzrecords->close();
 
         // The data for the last activity won't have been written yet, so make sure to write it now!
         if (!empty($transactions)) {
-            $coursecontext = \context_course::instance($paypalrecord->courseid);
+            $coursecontext = \context_course::instance($sslcommerzrecord->courseid);
             writer::with_context($coursecontext)->export_data(
                     [$strtransactions],
                     (object) ['transactions' => $transactions]
