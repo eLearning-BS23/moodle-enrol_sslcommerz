@@ -36,11 +36,8 @@ defined('MOODLE_INTERNAL') || die();
 class enrol_sslcommerz_plugin extends enrol_plugin {
 
     public function get_currencies() {
-        // See https://www.sslcommerz.com/cgi-bin/webscr?cmd=p/sell/mc/mc_intro-outside,
-        // 3-character ISO-4217: https://cms.sslcommerz.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_currency_codes
         $codes = array(
-            'AUD', 'BRL', 'CAD', 'CHF', 'CZK', 'DKK', 'EUR', 'GBP', 'HKD', 'HUF', 'ILS', 'INR', 'JPY',
-            'MXN', 'MYR', 'NOK', 'NZD', 'PHP', 'PLN', 'RUB', 'SEK', 'SGD', 'THB', 'TRY', 'TWD', 'USD','BDT');
+            'BDT');
         $currencies = array();
         foreach ($codes as $c) {
             $currencies[$c] = new lang_string($c, 'core_currencies');
@@ -195,7 +192,8 @@ class enrol_sslcommerz_plugin extends enrol_plugin {
             $cost = (float) $instance->cost;
         }
 
-        if (abs($cost) < 0.01) { // no cost, other enrolment methods (instances) should be used
+        if (abs($cost) < 0.01) {
+            // no cost, other enrolment methods (instances) should be used
             echo '<p>'.get_string('nocost', 'enrol_sslcommerz').'</p>';
         } else {
             // Calculate localised and "." cost, make sure we send sslcommerz the same value,
@@ -203,7 +201,8 @@ class enrol_sslcommerz_plugin extends enrol_plugin {
             $localisedcost = format_float($cost, 2, true);
             $cost = format_float($cost, 2, false);
 
-            if (isguestuser()) { // force login only for guest user, not real users with guest role
+            if (isguestuser()) {
+                // force login only for guest user, not real users with guest role
                 $wwwroot = $CFG->wwwroot;
                 echo '<div class="mdl-align"><p>'.get_string('paymentrequired').'</p>';
                 echo '<p><b>'.get_string('cost').": $instance->currency $localisedcost".'</b></p>';

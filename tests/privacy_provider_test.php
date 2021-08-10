@@ -37,7 +37,8 @@ use core_privacy\local\request\writer;
  * @author     Brain station 23 ltd.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\provider_testcase {
+class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\provider_testcase
+{
 
     /** @var stdClass A user whose email address matches the business field in some of the sslcommerz transactions. */
     protected $businessuser1;
@@ -81,7 +82,8 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
     /** @var stdClass A test course with 2 enrolments for student2 and student12. */
     protected $course3;
 
-    protected function setUp(): void {
+    protected function setUp(): void
+    {
         global $DB;
 
         $this->resetAfterTest();
@@ -107,15 +109,15 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
         $sslcommerzplugin = enrol_get_plugin('sslcommerz');
 
         $enrolinstanceid = $sslcommerzplugin->add_instance($this->course1,
-                ['roleid'   => $studentrole->id, 'courseid' => $this->course1->id]);
-        $enrolinstance1  = $DB->get_record('enrol', array('id' => $enrolinstanceid));
+            ['roleid' => $studentrole->id, 'courseid' => $this->course1->id]);
+        $enrolinstance1 = $DB->get_record('enrol', array('id' => $enrolinstanceid));
 
         $enrolinstanceid = $sslcommerzplugin->add_instance($this->course2,
-                ['roleid'   => $studentrole->id, 'courseid' => $this->course2->id]);
+            ['roleid' => $studentrole->id, 'courseid' => $this->course2->id]);
         $enrolinstance2 = $DB->get_record('enrol', array('id' => $enrolinstanceid));
 
         $enrolinstanceid = $sslcommerzplugin->add_instance($this->course3,
-                ['roleid'   => $studentrole->id, 'courseid' => $this->course3->id]);
+            ['roleid' => $studentrole->id, 'courseid' => $this->course3->id]);
         $enrolinstance3 = $DB->get_record('enrol', array('id' => $enrolinstanceid));
 
         // Create students.
@@ -202,7 +204,8 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
     /**
      * Test for provider::get_metadata().
      */
-    public function test_get_metadata() {
+    public function test_get_metadata()
+    {
         $collection = new collection('enrol_sslcommerz');
         $newcollection = provider::get_metadata($collection);
         $itemcollection = $newcollection->get_collection();
@@ -249,7 +252,8 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
     /**
      * Test for provider::get_contexts_for_userid().
      */
-    public function test_get_contexts_for_userid() {
+    public function test_get_contexts_for_userid()
+    {
         $coursecontext1 = context_course::instance($this->course1->id);
         $coursecontext2 = context_course::instance($this->course2->id);
 
@@ -272,7 +276,8 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
     /**
      * Test for provider::get_contexts_for_userid with a user who is a receiver.
      */
-    public function test_get_contexts_for_userid_receiver() {
+    public function test_get_contexts_for_userid_receiver()
+    {
         $coursecontext1 = context_course::instance($this->course1->id);
         $coursecontext2 = context_course::instance($this->course2->id);
 
@@ -294,7 +299,8 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
     /**
      * Test for provider::get_contexts_for_userid with a user who is a business.
      */
-    public function test_get_contexts_for_userid_business() {
+    public function test_get_contexts_for_userid_business()
+    {
         $coursecontext1 = context_course::instance($this->course1->id);
         $coursecontext2 = context_course::instance($this->course2->id);
         $coursecontext3 = context_course::instance($this->course3->id);
@@ -317,7 +323,8 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
     /**
      * Test for provider::export_user_data().
      */
-    public function test_export_user_data() {
+    public function test_export_user_data()
+    {
         $coursecontext1 = context_course::instance($this->course1->id);
 
         $this->setUser($this->student1);
@@ -334,7 +341,8 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
     /**
      * Test for provider::export_user_data() when user is not enrolled.
      */
-    public function test_export_user_data_not_enrolled() {
+    public function test_export_user_data_not_enrolled()
+    {
         $coursecontext1 = context_course::instance($this->course1->id);
 
         $this->setUser($this->student2);
@@ -348,7 +356,8 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
     /**
      * Test for provider::export_user_data() when user has no enrolment.
      */
-    public function test_export_user_data_no_enrolment() {
+    public function test_export_user_data_no_enrolment()
+    {
         $coursecontext1 = context_course::instance($this->course1->id);
 
         $this->setUser($this->student0);
@@ -359,7 +368,8 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
         $this->assertFalse($writer->has_any_data());
     }
 
-    public function test_export_user_data_multiple_sslcommerz_history() {
+    public function test_export_user_data_multiple_sslcommerz_history()
+    {
         $coursecontext2 = context_course::instance($this->course2->id);
 
         $this->setUser($this->student2);
@@ -371,14 +381,15 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
         $data = $writer->get_data([get_string('transactions', 'enrol_sslcommerz')]);
         $this->assertCount(2, $data->transactions);
         $this->assertEqualsCanonicalizing(
-                ['STUDENT2-IN-COURSE2-00', 'STUDENT2-IN-COURSE2-01'],
-                array_column($data->transactions, 'txn_id'));
+            ['STUDENT2-IN-COURSE2-00', 'STUDENT2-IN-COURSE2-01'],
+            array_column($data->transactions, 'txn_id'));
     }
 
     /**
      * Test for provider::delete_data_for_all_users_in_context().
      */
-    public function test_delete_data_for_all_users_in_context() {
+    public function test_delete_data_for_all_users_in_context()
+    {
         global $DB;
 
         $coursecontext1 = context_course::instance($this->course1->id);
@@ -386,12 +397,12 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
 
         // Before deletion, we should have 2 sslcommerz transactions in course1 and 3 sslcommerz transactions in course2.
         $this->assertEquals(
-                2,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id])
+            2,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id])
         );
         $this->assertEquals(
-                3,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id])
+            3,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id])
         );
 
         // Delete data based on context.
@@ -399,19 +410,20 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
 
         // After deletion, sslcommerz transactions in course1 should have been deleted.
         $this->assertEquals(
-                0,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id])
+            0,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id])
         );
         $this->assertEquals(
-                3,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id])
+            3,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id])
         );
     }
 
     /**
      * Test for provider::delete_data_for_all_users_in_context() when there is multiple transaction histories for a user.
      */
-    public function test_delete_data_for_all_users_in_context_multiple_transactions() {
+    public function test_delete_data_for_all_users_in_context_multiple_transactions()
+    {
         global $DB;
 
         $coursecontext2 = context_course::instance($this->course2->id);
@@ -419,12 +431,12 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
 
         // Before deletion, we should have 2 sslcommerz transactions in course1 and 3 sslcommerz transactions in course2.
         $this->assertEquals(
-                2,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id])
+            2,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id])
         );
         $this->assertEquals(
-                3,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id])
+            3,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id])
         );
 
         // Delete data based on context.
@@ -432,19 +444,20 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
 
         // After deletion, sslcommerz transactions in course2 should have been deleted.
         $this->assertEquals(
-                2,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id])
+            2,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id])
         );
         $this->assertEquals(
-                0,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id])
+            0,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id])
         );
     }
 
     /**
      * Test for provider::delete_data_for_user() when student is enrolled in multiple courses and deleting from one of them.
      */
-    public function test_delete_data_for_user_from_single_context() {
+    public function test_delete_data_for_user_from_single_context()
+    {
         global $DB;
 
         $coursecontext1 = context_course::instance($this->course1->id);
@@ -454,50 +467,51 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
         // Before deletion, we should have 2 sslcommerz transactions (1 of them for student12) in course1
         // and 3 sslcommerz transactions (1 of them for student12) in course2.
         $this->assertEquals(
-                2,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id])
+            2,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id])
         );
         $this->assertEquals(
-                1,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id, 'userid' => $this->student12->id])
+            1,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id, 'userid' => $this->student12->id])
         );
         $this->assertEquals(
-                3,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id])
+            3,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id])
         );
         $this->assertEquals(
-                1,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id, 'userid' => $this->student12->id])
+            1,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id, 'userid' => $this->student12->id])
         );
 
         // Delete data for user.
         $contextlist = new \core_privacy\local\request\approved_contextlist($this->student12, 'enrol_sslcommerz',
-                [$coursecontext1->id]);
+            [$coursecontext1->id]);
         provider::delete_data_for_user($contextlist);
 
         // After deletion, sslcommerz transactions for student12 in course1 should have been deleted.
         $this->assertEquals(
-                1,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id])
+            1,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id])
         );
         $this->assertEquals(
-                0,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id, 'userid' => $this->student12->id])
+            0,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id, 'userid' => $this->student12->id])
         );
         $this->assertEquals(
-                3,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id])
+            3,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id])
         );
         $this->assertEquals(
-                1,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id, 'userid' => $this->student12->id])
+            1,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id, 'userid' => $this->student12->id])
         );
     }
 
     /**
      * Test for provider::delete_data_for_user() when student is enrolled in multiple courses and deleting from all of them.
      */
-    public function test_delete_data_for_user_from_multiple_context() {
+    public function test_delete_data_for_user_from_multiple_context()
+    {
         global $DB;
 
         $coursecontext1 = context_course::instance($this->course1->id);
@@ -508,50 +522,51 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
         // Before deletion, we should have 2 sslcommerz transactions (1 of them for student12) in course1
         // and 3 sslcommerz transactions (1 of them for student12) in course2.
         $this->assertEquals(
-                2,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id])
+            2,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id])
         );
         $this->assertEquals(
-                1,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id, 'userid' => $this->student12->id])
+            1,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id, 'userid' => $this->student12->id])
         );
         $this->assertEquals(
-                3,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id])
+            3,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id])
         );
         $this->assertEquals(
-                1,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id, 'userid' => $this->student12->id])
+            1,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id, 'userid' => $this->student12->id])
         );
 
         // Delete data for user.
         $contextlist = new \core_privacy\local\request\approved_contextlist($this->student12, 'enrol_sslcommerz',
-                [$coursecontext1->id, $coursecontext2->id]);
+            [$coursecontext1->id, $coursecontext2->id]);
         provider::delete_data_for_user($contextlist);
 
         // After deletion, sslcommerz enrolment data for student12 in both course1 and course2 should have been deleted.
         $this->assertEquals(
-                1,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id])
+            1,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id])
         );
         $this->assertEquals(
-                0,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id, 'userid' => $this->student12->id])
+            0,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id, 'userid' => $this->student12->id])
         );
         $this->assertEquals(
-                2,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id])
+            2,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id])
         );
         $this->assertEquals(
-                0,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id, 'userid' => $this->student12->id])
+            0,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id, 'userid' => $this->student12->id])
         );
     }
 
     /**
      * Test for provider::delete_data_for_user() when user is not enrolled, but is the receiver of the payment.
      */
-    public function test_delete_data_for_user_for_business_user() {
+    public function test_delete_data_for_user_for_business_user()
+    {
         global $DB;
 
         $coursecontext1 = context_course::instance($this->course1->id);
@@ -561,42 +576,43 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
         // Before deletion, we should have 5 sslcommerz enrolments.
         // 3 of which paid to businessuser1 and 2 of which paid to businessuser2.
         $this->assertEquals(
-                3,
-                $DB->count_records('enrol_sslcommerz', ['business' => $this->businessuser1->email])
+            3,
+            $DB->count_records('enrol_sslcommerz', ['business' => $this->businessuser1->email])
         );
         $this->assertEquals(
-                2,
-                $DB->count_records('enrol_sslcommerz', ['business' => $this->businessuser2->email])
+            2,
+            $DB->count_records('enrol_sslcommerz', ['business' => $this->businessuser2->email])
         );
 
         // Delete data for user in $coursecontext1.
         $contextlist = new \core_privacy\local\request\approved_contextlist($this->businessuser1, 'enrol_sslcommerz',
-                [$coursecontext1->id]);
+            [$coursecontext1->id]);
         provider::delete_data_for_user($contextlist);
 
         // After deletion, sslcommerz enrolment data for businessuser1 in course1 should have been deleted.
         $this->assertEquals(
-                0,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id, 'business' => $this->businessuser1->email])
+            0,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id, 'business' => $this->businessuser1->email])
         );
         $this->assertEquals(
-                2,
-                $DB->count_records('enrol_sslcommerz', ['business' => $this->businessuser1->email])
+            2,
+            $DB->count_records('enrol_sslcommerz', ['business' => $this->businessuser1->email])
         );
         $this->assertEquals(
-                1,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id, 'business' => ''])
+            1,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id, 'business' => ''])
         );
         $this->assertEquals(
-                2,
-                $DB->count_records('enrol_sslcommerz', ['business' => $this->businessuser2->email])
+            2,
+            $DB->count_records('enrol_sslcommerz', ['business' => $this->businessuser2->email])
         );
     }
 
     /**
      * Test for provider::delete_data_for_user() when user is not enrolled, but is the receiver of the payment.
      */
-    public function test_delete_data_for_user_for_receiver_user() {
+    public function test_delete_data_for_user_for_receiver_user()
+    {
         global $DB;
 
         $coursecontext1 = context_course::instance($this->course1->id);
@@ -606,60 +622,61 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
         // Before deletion, we should have 5 sslcommerz enrolments.
         // 2 of which paid to receiveruser1 and 3 of which paid to receiveruser2.
         $this->assertEquals(
-                2,
-                $DB->count_records('enrol_sslcommerz', ['receiver_email' => $this->receiveruser1->email])
+            2,
+            $DB->count_records('enrol_sslcommerz', ['receiver_email' => $this->receiveruser1->email])
         );
         $this->assertEquals(
-                3,
-                $DB->count_records('enrol_sslcommerz', ['receiver_email' => $this->receiveruser2->email])
+            3,
+            $DB->count_records('enrol_sslcommerz', ['receiver_email' => $this->receiveruser2->email])
         );
 
         // Delete data for user.
         $contextlist = new \core_privacy\local\request\approved_contextlist($this->receiveruser1, 'enrol_sslcommerz',
-                [$coursecontext1->id]);
+            [$coursecontext1->id]);
         provider::delete_data_for_user($contextlist);
 
         // After deletion, sslcommerz enrolment data for receiveruser1 in course1 should have been deleted.
         $this->assertEquals(
-                0,
-                $DB->count_records('enrol_sslcommerz', ['receiver_email' => $this->receiveruser1->email])
+            0,
+            $DB->count_records('enrol_sslcommerz', ['receiver_email' => $this->receiveruser1->email])
         );
         $this->assertEquals(
-                2,
-                $DB->count_records('enrol_sslcommerz', ['receiver_email' => ''])
+            2,
+            $DB->count_records('enrol_sslcommerz', ['receiver_email' => ''])
         );
         $this->assertEquals(
-                3,
-                $DB->count_records('enrol_sslcommerz', ['receiver_email' => $this->receiveruser2->email])
+            3,
+            $DB->count_records('enrol_sslcommerz', ['receiver_email' => $this->receiveruser2->email])
         );
     }
 
     /**
      * Helper function to create an enrol_sslcommerz record.
      *
-     * @param   \stdClass   $business The user associated with the business
-     * @param   \stdClass   $receiver The user associated with the receiver
-     * @param   \stdClass   $course The course to associate with
-     * @param   \stdClass   $user The user associated with the student
-     * @param   \stdClass   $enrol The enrolment instance
-     * @param   String      $txnid The sslcommerz txnid to use
-     * @param   int         $time The txn time
+     * @param \stdClass $business The user associated with the business
+     * @param \stdClass $receiver The user associated with the receiver
+     * @param \stdClass $course The course to associate with
+     * @param \stdClass $user The user associated with the student
+     * @param \stdClass $enrol The enrolment instance
+     * @param String $txnid The sslcommerz txnid to use
+     * @param int $time The txn time
      */
-    protected function create_enrol_sslcommerz_record($business, $receiver, $course, $user, $enrol, $txnid, $time) {
+    protected function create_enrol_sslcommerz_record($business, $receiver, $course, $user, $enrol, $txnid, $time)
+    {
         global $DB;
 
         $sslcommerzdata = [
-            'business'       => $business->email,
+            'business' => $business->email,
             'receiver_email' => $receiver->email,
-            'receiver_id'    => 'SELLERSID',
-            'item_name'      => $course->fullname,
-            'courseid'       => $course->id,
-            'userid'         => $user->id,
-            'instanceid'     => $enrol->id,
+            'receiver_id' => 'SELLERSID',
+            'item_name' => $course->fullname,
+            'courseid' => $course->id,
+            'userid' => $user->id,
+            'instanceid' => $enrol->id,
             'payment_status' => 'Completed',
-            'txn_id'         => $txnid,
-            'payment_type'   => 'instant',
-            'timeupdated'    => $time,
+            'txn_id' => $txnid,
+            'payment_type' => 'instant',
+            'timeupdated' => $time,
         ];
         $DB->insert_record('enrol_sslcommerz', $sslcommerzdata);
     }
@@ -667,7 +684,8 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
     /**
      * Test for provider::get_users_in_context().
      */
-    public function test_get_users_in_context() {
+    public function test_get_users_in_context()
+    {
         $coursecontext1 = context_course::instance($this->course1->id);
         $coursecontext2 = context_course::instance($this->course2->id);
         $coursecontext3 = context_course::instance($this->course3->id);
@@ -675,45 +693,46 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
         $userlist1 = new \core_privacy\local\request\userlist($coursecontext1, 'enrol_sslcommerz');
         provider::get_users_in_context($userlist1);
         $this->assertEqualsCanonicalizing(
-                [
-                    $this->businessuser1->id,
-                    $this->businessuser2->id,
-                    $this->receiveruser1->id,
-                    $this->student1->id,
-                    $this->student12->id
-                ],
-                $userlist1->get_userids()
+            [
+                $this->businessuser1->id,
+                $this->businessuser2->id,
+                $this->receiveruser1->id,
+                $this->student1->id,
+                $this->student12->id
+            ],
+            $userlist1->get_userids()
         );
 
         $userlist2 = new \core_privacy\local\request\userlist($coursecontext2, 'enrol_sslcommerz');
         provider::get_users_in_context($userlist2);
         $this->assertEqualsCanonicalizing(
-                [
-                    $this->businessuser1->id,
-                    $this->businessuser2->id,
-                    $this->receiveruser2->id,
-                    $this->student2->id,
-                    $this->student12->id
-                ],
-                $userlist2->get_userids()
+            [
+                $this->businessuser1->id,
+                $this->businessuser2->id,
+                $this->receiveruser2->id,
+                $this->student2->id,
+                $this->student12->id
+            ],
+            $userlist2->get_userids()
         );
 
         $userlist3 = new \core_privacy\local\request\userlist($coursecontext3, 'enrol_sslcommerz');
         provider::get_users_in_context($userlist3);
         $this->assertEqualsCanonicalizing(
-                [
-                    $this->businessuser3->id,
-                    $this->receiveruser3->id,
-                    $this->student3->id
-                ],
-                $userlist3->get_userids()
+            [
+                $this->businessuser3->id,
+                $this->receiveruser3->id,
+                $this->student3->id
+            ],
+            $userlist3->get_userids()
         );
     }
 
     /**
      * Test for provider::delete_data_for_users().
      */
-    public function test_delete_data_for_users() {
+    public function test_delete_data_for_users()
+    {
         global $DB;
 
         $coursecontext1 = context_course::instance($this->course1->id);
@@ -723,26 +742,26 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
         // Student12 is enrolled in course1 and course2.
         // There is 1 transaction in course1 and 2 transactions in course2 under the name of businessuser1.
         $this->assertEquals(
-                2,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id])
+            2,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id])
         );
         $this->assertEqualsCanonicalizing(
-                [$this->course1->id, $this->course2->id],
-                $DB->get_fieldset_select('enrol_sslcommerz', 'courseid', 'userid = ?', [$this->student12->id])
+            [$this->course1->id, $this->course2->id],
+            $DB->get_fieldset_select('enrol_sslcommerz', 'courseid', 'userid = ?', [$this->student12->id])
         );
         $this->assertEqualsCanonicalizing(
-                [$this->course1->id, $this->course2->id, $this->course2->id],
-                $DB->get_fieldset_select('enrol_sslcommerz', 'courseid', 'business = ?',
-                        [\core_text::strtolower($this->businessuser1->email)])
+            [$this->course1->id, $this->course2->id, $this->course2->id],
+            $DB->get_fieldset_select('enrol_sslcommerz', 'courseid', 'business = ?',
+                [\core_text::strtolower($this->businessuser1->email)])
         );
         $this->assertEquals(
-                3,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id])
+            3,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id])
         );
 
         // Delete data of student12 and businessuser1 in course1.
         $approveduserlist = new \core_privacy\local\request\approved_userlist($coursecontext1, 'enrol_sslcommerz',
-                [$this->student12->id, $this->businessuser1->id]);
+            [$this->student12->id, $this->businessuser1->id]);
         provider::delete_data_for_users($approveduserlist);
 
         // After deletion, sslcommerz transactions for student12 in course1 should have been deleted.
@@ -752,28 +771,29 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
         // There is no transaction in course1 under the name of businessuser1, but the 2 transactions in course2
         // that were under his/her name are intact.
         $this->assertEquals(
-                1,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id])
+            1,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course1->id])
         );
         $this->assertEqualsCanonicalizing(
-                [$this->course2->id],
-                $DB->get_fieldset_select('enrol_sslcommerz', 'courseid', 'userid = ?', [$this->student12->id])
+            [$this->course2->id],
+            $DB->get_fieldset_select('enrol_sslcommerz', 'courseid', 'userid = ?', [$this->student12->id])
         );
         $this->assertEqualsCanonicalizing(
-                [$this->course2->id, $this->course2->id],
-                $DB->get_fieldset_select('enrol_sslcommerz', 'courseid', 'business = ?',
-                        [\core_text::strtolower($this->businessuser1->email)])
+            [$this->course2->id, $this->course2->id],
+            $DB->get_fieldset_select('enrol_sslcommerz', 'courseid', 'business = ?',
+                [\core_text::strtolower($this->businessuser1->email)])
         );
         $this->assertEquals(
-                3,
-                $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id])
+            3,
+            $DB->count_records('enrol_sslcommerz', ['courseid' => $this->course2->id])
         );
     }
 
     /**
      * Test for provider::delete_data_for_users() for business user deletion.
      */
-    public function test_delete_data_for_users_business() {
+    public function test_delete_data_for_users_business()
+    {
         global $DB;
 
         $coursecontext1 = context_course::instance($this->course1->id);
@@ -789,7 +809,7 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
 
         // Delete data of businessuser1 in course1.
         $approveduserlist = new \core_privacy\local\request\approved_userlist($coursecontext1, 'enrol_sslcommerz',
-                [$this->businessuser1->id]);
+            [$this->businessuser1->id]);
         provider::delete_data_for_users($approveduserlist);
 
         // After deletion, there should be 2 transactions under the name of businessuser1 and none of them should be in course1.
@@ -808,7 +828,8 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
     /**
      * Test for provider::delete_data_for_users() for receiver user deletion.
      */
-    public function test_delete_data_for_users_receiver() {
+    public function test_delete_data_for_users_receiver()
+    {
         global $DB;
 
         $coursecontext1 = context_course::instance($this->course1->id);
@@ -823,7 +844,7 @@ class enrol_sslcommerz_privacy_provider_testcase extends \core_privacy\tests\pro
 
         // Delete data of receiveruser1 in course1.
         $approveduserlist = new \core_privacy\local\request\approved_userlist($coursecontext1, 'enrol_sslcommerz',
-                [$this->receiveruser1->id]);
+            [$this->receiveruser1->id]);
         provider::delete_data_for_users($approveduserlist);
 
         // After deletion, there should be no transaction under the name of receiveruser1.

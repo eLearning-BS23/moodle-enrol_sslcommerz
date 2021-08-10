@@ -94,3 +94,8 @@ $string['status'] = 'Allow sslcommerz enrolments';
 $string['status_desc'] = 'Allow users to use sslcommerz to enrol into a course by default.';
 $string['transactions'] = 'sslcommerz transactions';
 $string['unenrolselfconfirm'] = 'Do you really want to unenrol yourself from course "{$a}"?';
+$string['paymendue'] = 'Amount paid is not enough "{$a}"?';
+$string['coursemissing'] = 'Course "{$a}" doesn\'t exist';
+$string['usermissing'] = 'User {$a} doesn\'t exist';
+$string['pluginname'] = 'sslcommerz';
+

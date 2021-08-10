@@ -1,12 +1,16 @@
 <?php
 
 
+
 use mod_lti\local\ltiservice\response;
 
 require("../../config.php");
 require_once("$CFG->dirroot/enrol/sslcommerz/lib.php");
 
 global $CFG, $USER;
+
+//add_to_log($courseid, $module, $action, $url='', $info='', $cm=0, $user=0);
+
 
 // This file is part of Moodle - http://moodle.org/
 //
