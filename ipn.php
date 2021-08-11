@@ -103,7 +103,7 @@ $plugin = enrol_get_plugin('sslcommerz');
 $valid = urlencode($_POST['val_id']);
 $storeid = urlencode(get_config('enrol_sslcommerz')->sslstoreid);
 $storepasswd = urlencode(get_config('enrol_sslcommerz')->sslstorepassword);
-$requested_url = ("https://sandbox.sslcommerz.com/validator/api/validationserverAPI.php?val_id=" . $valid . "&store_id=" . $storeid . "&store_passwd=" . $storepasswd . "&v=1&format=json");
+$requested_url = (get_config("enrol_sslcommerz")->requestedurl."?val_id=" . $valid . "&store_id=" . $storeid . "&store_passwd=" . $storepasswd . "&v=1&format=json");
 
 $handle = curl_init();
 curl_setopt($handle, CURLOPT_URL, $requested_url);
@@ -115,12 +115,9 @@ $result = curl_exec($handle);
 
 $code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 
-
 $result = json_decode($result);
 
-
-if ($result->status == "VALID" || $result->status == "VALIDATED") {
-
+if ($result) {
 
     if (!empty($SESSION->wantsurl)) {
         $destination = $SESSION->wantsurl;
@@ -141,17 +138,8 @@ if ($result->status == "VALID" || $result->status == "VALIDATED") {
             $data);
         die;
     }
-    // check currency
-//    if ($data->payment_currency != $plugin_instance->currency) {
-//        \enrol_sslcommerz\util::message_sslcommerz_error_to_admin(
-//            "Currency does not match course settings, received: " . $data->mc_currency,
-//            $data);
-//        die;
-//    }
 
-//
-//
-        $validation = $DB->get_record('enrol_sslcommerz', array('txn_id'=>$result->tran_id));
+    $validation = $DB->get_record('enrol_sslcommerz', array('txn_id' => $result->tran_id));
 
     // Make sure this transaction doesn't exist already.
     if ($existing = $DB->get_record("enrol_sslcommerz", array("txn_id" => $data->txn_id), "*", IGNORE_MULTIPLE)) {
@@ -162,7 +150,6 @@ if ($result->status == "VALID" || $result->status == "VALIDATED") {
     if (!$user = $DB->get_record('user', array('id' => $data->userid))) {   // Check that user exists
         \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("User $data->userid doesn't exist", $data);
         redirect($destination, get_string('usermissing', 'enrol_sslcommerz', $data->userid));
-
         die;
     }
 
@@ -171,7 +158,6 @@ if ($result->status == "VALID" || $result->status == "VALIDATED") {
         redirect($destination, get_string('coursemissing', 'enrol_sslcommerz', $data->courseid));
         die;
     }
-
 
     if ((float)$plugin_instance->cost <= 0) {
         $cost = (float)$plugin->get_config('cost');
@@ -187,127 +173,406 @@ if ($result->status == "VALID" || $result->status == "VALIDATED") {
         redirect($destination, get_string('paymendue', 'enrol_sslcommerz', $result->amount));
         die;
     }
+
     // Use the queried course's full name for the item_name field.
     $data->item_name = $course->fullname;
-
+    $data->payment_status = $result->status;
 
     $coursecontext = context_course::instance($course->id, IGNORE_MISSING);
 
-    // Check that amount paid is the correct amount
+    switch ($result->status) {
+        case 'VALID':
+            if ($result->status == 'Pending') {
+                if ($validation) {
+                    $data->id = $validation->id;
+                    $data->payment_status = 'Pending';
+                    $entry = $DB->update_record("enrol_sslcommerz", $data, $bulk = false);
+                    $DB->insert_record("enrol_sslcommerz_log", $data, $bulk = false);
+
+                    if ($entry) {
+
+                        if ($plugin_instance->enrolperiod) {
+                            $timestart = time();
+                            $timeend = $timestart + $plugin_instance->enrolperiod;
+                        } else {
+                            $timestart = 0;
+                            $timeend = 0;
+                        }
+
+                        // Enrol user
+                        $plugin->enrol_user($plugin_instance, $user->id, $plugin_instance->roleid, $timestart, $timeend);
 
 
-    // ALL CLEAR !
+                        $this->mailFuntion($context);
+
+                        $fullname = format_string($course->fullname, true, array('context' => $context));
+
+                        if (is_enrolled($context, $user, '', true)) { // TODO: use real sslcommerz check
+                            redirect($destination, get_string('paymentthanks', '', $fullname));
+
+                        } else {   /// Somehow they aren't enrolled yet!  :-(
+                            $PAGE->set_url($destination);
+                            echo $OUTPUT->header();
+                            $a = new stdClass();
+                            $a->teacher = get_string('defaultcourseteacher');
+                            $a->fullname = $fullname;
+                            notice(get_string('paymentsorry', '', $a), $destination);
+                        }
+
+                    } else {
+                        redirect($destination, get_string('paymenterror', '', $fullname));
+                    }
+
+                } else {
+                    $data->id = $validation->id;
+                    $data->payment_status = 'Failed';
+                    $entry = $DB->update_record("enrol_sslcommerz", $data, $bulk = false);
+                    $DB->insert_record("enrol_sslcommerz_log", $data, $bulk = false);
+                    redirect($destination, get_string('paymentfail', 'enrol_sslcommerz', $fullname));
+                }
+
+            } else if ($result->status == 'Processing') {
+                $data->id = $validation->id;
+                $data->payment_status = 'Processing';
+                $entry = $DB->update_record("enrol_sslcommerz", $data, $bulk = false);
+                $DB->insert_record("enrol_sslcommerz_log", $data, $bulk = false);
+                if ($plugin_instance->enrolperiod) {
+                    $timestart = time();
+                    $timeend = $timestart + $plugin_instance->enrolperiod;
+                } else {
+                    $timestart = 0;
+                    $timeend = 0;
+                }
+                // Enrol user
+                $plugin->enrol_user($plugin_instance, $user->id, $plugin_instance->roleid, $timestart, $timeend);
+
+                redirect($destination, get_string('paymentthanks', '', $fullname));
+
+            } else {
+                $data->id = $validation->id;
+                $data->payment_status = 'Pending';
+                $entry = $DB->update_record("enrol_sslcommerz", $data, $bulk = false);
+                $DB->insert_record("enrol_sslcommerz_log", $data, $bulk = false);
+
+                if ($entry) {
+
+                    if ($plugin_instance->enrolperiod) {
+                        $timestart = time();
+                        $timeend = $timestart + $plugin_instance->enrolperiod;
+                    } else {
+                        $timestart = 0;
+                        $timeend = 0;
+                    }
+
+                    // Enrol user
+                    $plugin->enrol_user($plugin_instance, $user->id, $plugin_instance->roleid, $timestart, $timeend);
+
+                    // Pass $view=true to filter hidden caps if the user cannot see them
+                    if ($users = get_users_by_capability($context, 'moodle/course:update', 'u.*', 'u.id ASC',
+                        '', '', '', '', false, true)) {
+                        $users = sort_by_roleassignment_authority($users, $context);
+                        $teacher = array_shift($users);
+                    } else {
+                        $teacher = false;
+                    }
+
+                    $mailstudents = $plugin->get_config('mailstudents');
+                    $mailteachers = $plugin->get_config('mailteachers');
+                    $mailadmins = $plugin->get_config('mailadmins');
+                    $shortname = format_string($course->shortname, true, array('context' => $context));
 
 
-    $data->id = $validation->id;
-    $DB->update_record("enrol_sslcommerz", $data, $bulk = false);
+                    if (!empty($mailstudents)) {
+                        $a = new stdClass();
+                        $a->coursename = format_string($course->fullname, true, array('context' => $coursecontext));
+                        $a->profileurl = "$CFG->wwwroot/user/view.php?id=$user->id";
 
-    if ($plugin_instance->enrolperiod) {
-        $timestart = time();
-        $timeend = $timestart + $plugin_instance->enrolperiod;
-    } else {
-        $timestart = 0;
-        $timeend = 0;
+                        $eventdata = new \core\message\message();
+                        $eventdata->courseid = $course->id;
+                        $eventdata->modulename = 'moodle';
+                        $eventdata->component = 'enrol_sslcommerz';
+                        $eventdata->name = 'sslcommerz_enrolment';
+                        $eventdata->userfrom = empty($teacher) ? core_user::get_noreply_user() : $teacher;
+                        $eventdata->userto = $user;
+                        $eventdata->subject = get_string("enrolmentnew", 'enrol', $shortname);
+                        $eventdata->fullmessage = get_string('welcometocoursetext', '', $a);
+                        $eventdata->fullmessageformat = FORMAT_PLAIN;
+                        $eventdata->fullmessagehtml = '';
+                        $eventdata->smallmessage = '';
+                        message_send($eventdata);
+
+                    }
+
+                    if (!empty($mailteachers) && !empty($teacher)) {
+                        $a->course = format_string($course->fullname, true, array('context' => $coursecontext));
+                        $a->user = fullname($user);
+
+                        $eventdata = new \core\message\message();
+                        $eventdata->courseid = $course->id;
+                        $eventdata->modulename = 'moodle';
+                        $eventdata->component = 'enrol_sslcommerz';
+                        $eventdata->name = 'sslcommerz_enrolment';
+                        $eventdata->userfrom = $user;
+                        $eventdata->userto = $teacher;
+                        $eventdata->subject = get_string("enrolmentnew", 'enrol', $shortname);
+                        $eventdata->fullmessage = get_string('enrolmentnewuser', 'enrol', $a);
+                        $eventdata->fullmessageformat = FORMAT_PLAIN;
+                        $eventdata->fullmessagehtml = '';
+                        $eventdata->smallmessage = '';
+                        message_send($eventdata);
+                    }
+
+                    if (!empty($mailadmins)) {
+                        $a->course = format_string($course->fullname, true, array('context' => $coursecontext));
+                        $a->user = fullname($user);
+                        $admins = get_admins();
+                        foreach ($admins as $admin) {
+                            $eventdata = new \core\message\message();
+                            $eventdata->courseid = $course->id;
+                            $eventdata->modulename = 'moodle';
+                            $eventdata->component = 'enrol_sslcommerz';
+                            $eventdata->name = 'sslcommerz_enrolment';
+                            $eventdata->userfrom = $user;
+                            $eventdata->userto = $admin;
+                            $eventdata->subject = get_string("enrolmentnew", 'enrol', $shortname);
+                            $eventdata->fullmessage = get_string('enrolmentnewuser', 'enrol', $a);
+                            $eventdata->fullmessageformat = FORMAT_PLAIN;
+                            $eventdata->fullmessagehtml = '';
+                            $eventdata->smallmessage = '';
+                            message_send($eventdata);
+                        }
+                    }
+
+                    // Pass $view=true to filter hidden caps if the user cannot see them
+                    if ($users = get_users_by_capability($context, 'moodle/course:update', 'u.*', 'u.id ASC',
+                        '', '', '', '', false, true)) {
+                        $users = sort_by_roleassignment_authority($users, $context);
+                        $teacher = array_shift($users);
+                    } else {
+                        $teacher = false;
+                    }
+
+                    $mailstudents = $plugin->get_config('mailstudents');
+                    $mailteachers = $plugin->get_config('mailteachers');
+                    $mailadmins = $plugin->get_config('mailadmins');
+                    $shortname = format_string($course->shortname, true, array('context' => $context));
+
+
+                    if (!empty($mailstudents)) {
+                        $a = new stdClass();
+                        $a->coursename = format_string($course->fullname, true, array('context' => $coursecontext));
+                        $a->profileurl = "$CFG->wwwroot/user/view.php?id=$user->id";
+
+                        $eventdata = new \core\message\message();
+                        $eventdata->courseid = $course->id;
+                        $eventdata->modulename = 'moodle';
+                        $eventdata->component = 'enrol_sslcommerz';
+                        $eventdata->name = 'sslcommerz_enrolment';
+                        $eventdata->userfrom = empty($teacher) ? core_user::get_noreply_user() : $teacher;
+                        $eventdata->userto = $user;
+                        $eventdata->subject = get_string("enrolmentnew", 'enrol', $shortname);
+                        $eventdata->fullmessage = get_string('welcometocoursetext', '', $a);
+                        $eventdata->fullmessageformat = FORMAT_PLAIN;
+                        $eventdata->fullmessagehtml = '';
+                        $eventdata->smallmessage = '';
+                        message_send($eventdata);
+
+                    }
+
+                    if (!empty($mailteachers) && !empty($teacher)) {
+                        $a->course = format_string($course->fullname, true, array('context' => $coursecontext));
+                        $a->user = fullname($user);
+
+                        $eventdata = new \core\message\message();
+                        $eventdata->courseid = $course->id;
+                        $eventdata->modulename = 'moodle';
+                        $eventdata->component = 'enrol_sslcommerz';
+                        $eventdata->name = 'sslcommerz_enrolment';
+                        $eventdata->userfrom = $user;
+                        $eventdata->userto = $teacher;
+                        $eventdata->subject = get_string("enrolmentnew", 'enrol', $shortname);
+                        $eventdata->fullmessage = get_string('enrolmentnewuser', 'enrol', $a);
+                        $eventdata->fullmessageformat = FORMAT_PLAIN;
+                        $eventdata->fullmessagehtml = '';
+                        $eventdata->smallmessage = '';
+                        message_send($eventdata);
+                    }
+
+                    if (!empty($mailadmins)) {
+                        $a->course = format_string($course->fullname, true, array('context' => $coursecontext));
+                        $a->user = fullname($user);
+                        $admins = get_admins();
+                        foreach ($admins as $admin) {
+                            $eventdata = new \core\message\message();
+                            $eventdata->courseid = $course->id;
+                            $eventdata->modulename = 'moodle';
+                            $eventdata->component = 'enrol_sslcommerz';
+                            $eventdata->name = 'sslcommerz_enrolment';
+                            $eventdata->userfrom = $user;
+                            $eventdata->userto = $admin;
+                            $eventdata->subject = get_string("enrolmentnew", 'enrol', $shortname);
+                            $eventdata->fullmessage = get_string('enrolmentnewuser', 'enrol', $a);
+                            $eventdata->fullmessageformat = FORMAT_PLAIN;
+                            $eventdata->fullmessagehtml = '';
+                            $eventdata->smallmessage = '';
+                            message_send($eventdata);
+                        }
+                    }
+
+                    $fullname = format_string($course->fullname, true, array('context' => $context));
+
+                    if (is_enrolled($context, $user, '', true)) { // TODO: use real sslcommerz check
+                        redirect($destination, get_string('paymentthanks', '', $fullname));
+
+                    } else {   /// Somehow they aren't enrolled yet!  :-(
+                        $PAGE->set_url($destination);
+                        echo $OUTPUT->header();
+                        $a = new stdClass();
+                        $a->teacher = get_string('defaultcourseteacher');
+                        $a->fullname = $fullname;
+                        notice(get_string('paymentsorry', '', $a), $destination);
+                    }
+                }
+            }
+
+            break;
+        case 'VALIDATED':
+
+            if ($validation) {
+
+                $data->id = $validation->id;
+                $data->payment_status = 'Pending';
+                $entry = $DB->update_record("enrol_sslcommerz", $data, $bulk = false);
+                $DB->insert_record("enrol_sslcommerz_log", $data, $bulk = false);
+                if ($entry) {
+                    if ($plugin_instance->enrolperiod) {
+                        $timestart = time();
+                        $timeend = $timestart + $plugin_instance->enrolperiod;
+                    } else {
+                        $timestart = 0;
+                        $timeend = 0;
+                    }
+
+                    // Pass $view=true to filter hidden caps if the user cannot see them
+                    if ($users = get_users_by_capability($context, 'moodle/course:update', 'u.*', 'u.id ASC',
+                        '', '', '', '', false, true)) {
+                        $users = sort_by_roleassignment_authority($users, $context);
+                        $teacher = array_shift($users);
+                    } else {
+                        $teacher = false;
+                    }
+
+                    $mailstudents = $plugin->get_config('mailstudents');
+                    $mailteachers = $plugin->get_config('mailteachers');
+                    $mailadmins = $plugin->get_config('mailadmins');
+                    $shortname = format_string($course->shortname, true, array('context' => $context));
+
+
+                    if (!empty($mailstudents)) {
+                        $a = new stdClass();
+                        $a->coursename = format_string($course->fullname, true, array('context' => $coursecontext));
+                        $a->profileurl = "$CFG->wwwroot/user/view.php?id=$user->id";
+
+                        $eventdata = new \core\message\message();
+                        $eventdata->courseid = $course->id;
+                        $eventdata->modulename = 'moodle';
+                        $eventdata->component = 'enrol_sslcommerz';
+                        $eventdata->name = 'sslcommerz_enrolment';
+                        $eventdata->userfrom = empty($teacher) ? core_user::get_noreply_user() : $teacher;
+                        $eventdata->userto = $user;
+                        $eventdata->subject = get_string("enrolmentnew", 'enrol', $shortname);
+                        $eventdata->fullmessage = get_string('welcometocoursetext', '', $a);
+                        $eventdata->fullmessageformat = FORMAT_PLAIN;
+                        $eventdata->fullmessagehtml = '';
+                        $eventdata->smallmessage = '';
+                        message_send($eventdata);
+
+                    }
+
+                    if (!empty($mailteachers) && !empty($teacher)) {
+                        $a->course = format_string($course->fullname, true, array('context' => $coursecontext));
+                        $a->user = fullname($user);
+
+                        $eventdata = new \core\message\message();
+                        $eventdata->courseid = $course->id;
+                        $eventdata->modulename = 'moodle';
+                        $eventdata->component = 'enrol_sslcommerz';
+                        $eventdata->name = 'sslcommerz_enrolment';
+                        $eventdata->userfrom = $user;
+                        $eventdata->userto = $teacher;
+                        $eventdata->subject = get_string("enrolmentnew", 'enrol', $shortname);
+                        $eventdata->fullmessage = get_string('enrolmentnewuser', 'enrol', $a);
+                        $eventdata->fullmessageformat = FORMAT_PLAIN;
+                        $eventdata->fullmessagehtml = '';
+                        $eventdata->smallmessage = '';
+                        message_send($eventdata);
+                    }
+
+                    if (!empty($mailadmins)) {
+                        $a->course = format_string($course->fullname, true, array('context' => $coursecontext));
+                        $a->user = fullname($user);
+                        $admins = get_admins();
+                        foreach ($admins as $admin) {
+                            $eventdata = new \core\message\message();
+                            $eventdata->courseid = $course->id;
+                            $eventdata->modulename = 'moodle';
+                            $eventdata->component = 'enrol_sslcommerz';
+                            $eventdata->name = 'sslcommerz_enrolment';
+                            $eventdata->userfrom = $user;
+                            $eventdata->userto = $admin;
+                            $eventdata->subject = get_string("enrolmentnew", 'enrol', $shortname);
+                            $eventdata->fullmessage = get_string('enrolmentnewuser', 'enrol', $a);
+                            $eventdata->fullmessageformat = FORMAT_PLAIN;
+                            $eventdata->fullmessagehtml = '';
+                            $eventdata->smallmessage = '';
+                            message_send($eventdata);
+                        }
+                    }
+
+                    // Enrol user
+                    $plugin->enrol_user($plugin_instance, $user->id, $plugin_instance->roleid, $timestart, $timeend);
+
+
+                    $fullname = format_string($course->fullname, true, array('context' => $context));
+
+                    if (is_enrolled($context, $user, '', true)) { // TODO: use real sslcommerz check
+                        redirect($destination, get_string('paymentthanks', '', $fullname));
+
+                    } else {   /// Somehow they aren't enrolled yet!  :-(
+                        $PAGE->set_url($destination);
+                        echo $OUTPUT->header();
+                        $a = new stdClass();
+                        $a->teacher = get_string('defaultcourseteacher');
+                        $a->fullname = $fullname;
+                        notice(get_string('paymentsorry', '', $a), $destination);
+                    }
+                }
+            }
+
+            break;
+
+        case 'FAILED':
+
+            $data->id = $validation->id;
+            $data->payment_status = 'Processing';
+            $entry = $DB->update_record("enrol_sslcommerz", $data, $bulk = false);
+            $DB->insert_record("enrol_sslcommerz_log", $data, $bulk = false);
+            redirect($destination, get_string('paymentfail', 'enrol_sslcommerz', $fullname));
+
+            break;
+
+        case 'CANCELLED':
+
+            echo "Payment was Cancelled";
+
+            break;
+
+        default:
+
+            echo "Invalid Information.";
+
+            break;
     }
-
-    // Enrol user
-    $plugin->enrol_user($plugin_instance, $user->id, $plugin_instance->roleid, $timestart, $timeend);
-
-    // Pass $view=true to filter hidden caps if the user cannot see them
-    if ($users = get_users_by_capability($context, 'moodle/course:update', 'u.*', 'u.id ASC',
-        '', '', '', '', false, true)) {
-        $users = sort_by_roleassignment_authority($users, $context);
-        $teacher = array_shift($users);
-    } else {
-        $teacher = false;
-    }
-
-    $mailstudents = $plugin->get_config('mailstudents');
-    $mailteachers = $plugin->get_config('mailteachers');
-    $mailadmins = $plugin->get_config('mailadmins');
-    $shortname = format_string($course->shortname, true, array('context' => $context));
-
-
-    if (!empty($mailstudents)) {
-        $a = new stdClass();
-        $a->coursename = format_string($course->fullname, true, array('context' => $coursecontext));
-        $a->profileurl = "$CFG->wwwroot/user/view.php?id=$user->id";
-
-        $eventdata = new \core\message\message();
-        $eventdata->courseid = $course->id;
-        $eventdata->modulename = 'moodle';
-        $eventdata->component = 'enrol_sslcommerz';
-        $eventdata->name = 'sslcommerz_enrolment';
-        $eventdata->userfrom = empty($teacher) ? core_user::get_noreply_user() : $teacher;
-        $eventdata->userto = $user;
-        $eventdata->subject = get_string("enrolmentnew", 'enrol', $shortname);
-        $eventdata->fullmessage = get_string('welcometocoursetext', '', $a);
-        $eventdata->fullmessageformat = FORMAT_PLAIN;
-        $eventdata->fullmessagehtml = '';
-        $eventdata->smallmessage = '';
-        message_send($eventdata);
-
-    }
-
-    if (!empty($mailteachers) && !empty($teacher)) {
-        $a->course = format_string($course->fullname, true, array('context' => $coursecontext));
-        $a->user = fullname($user);
-
-        $eventdata = new \core\message\message();
-        $eventdata->courseid = $course->id;
-        $eventdata->modulename = 'moodle';
-        $eventdata->component = 'enrol_sslcommerz';
-        $eventdata->name = 'sslcommerz_enrolment';
-        $eventdata->userfrom = $user;
-        $eventdata->userto = $teacher;
-        $eventdata->subject = get_string("enrolmentnew", 'enrol', $shortname);
-        $eventdata->fullmessage = get_string('enrolmentnewuser', 'enrol', $a);
-        $eventdata->fullmessageformat = FORMAT_PLAIN;
-        $eventdata->fullmessagehtml = '';
-        $eventdata->smallmessage = '';
-        message_send($eventdata);
-    }
-
-    if (!empty($mailadmins)) {
-        $a->course = format_string($course->fullname, true, array('context' => $coursecontext));
-        $a->user = fullname($user);
-        $admins = get_admins();
-        foreach ($admins as $admin) {
-            $eventdata = new \core\message\message();
-            $eventdata->courseid = $course->id;
-            $eventdata->modulename = 'moodle';
-            $eventdata->component = 'enrol_sslcommerz';
-            $eventdata->name = 'sslcommerz_enrolment';
-            $eventdata->userfrom = $user;
-            $eventdata->userto = $admin;
-            $eventdata->subject = get_string("enrolmentnew", 'enrol', $shortname);
-            $eventdata->fullmessage = get_string('enrolmentnewuser', 'enrol', $a);
-            $eventdata->fullmessageformat = FORMAT_PLAIN;
-            $eventdata->fullmessagehtml = '';
-            $eventdata->smallmessage = '';
-            message_send($eventdata);
-        }
-    }
-
-
-    $fullname = format_string($course->fullname, true, array('context' => $context));
-
-
-    if (is_enrolled($context, $user, '', true)) { // TODO: use real sslcommerz check
-        redirect($destination, get_string('paymentthanks', '', $fullname));
-
-    } else {   /// Somehow they aren't enrolled yet!  :-(
-        $PAGE->set_url($destination);
-        echo $OUTPUT->header();
-        $a = new stdClass();
-        $a->teacher = get_string('defaultcourseteacher');
-        $a->fullname = $fullname;
-        notice(get_string('paymentsorry', '', $a), $destination);
-    }
-} else {// ERROR
-    $DB->insert_record("enrol_sslcommerz", $data, false);
-    throw new moodle_exception('erripninvalid', 'enrol_sslcommerz', '', null, json_encode($data));
 
 }
-
 

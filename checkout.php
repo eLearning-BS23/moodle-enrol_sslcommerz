@@ -70,7 +70,7 @@ $DB->insert_record("enrol_sslcommerz", $data);
 
 
 // # REQUEST SEND TO SSLCOMMERZ
-$direct_api_url = "https://sandbox.sslcommerz.com/gwprocess/v3/api.php";
+$direct_api_url = get_config("enrol_sslcommerz")->apiurl;
 $handle = curl_init();
 curl_setopt($handle, CURLOPT_URL, $direct_api_url);
 curl_setopt($handle, CURLOPT_TIMEOUT, 30);
