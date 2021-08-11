@@ -104,6 +104,7 @@ curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false); # IF YOU RUN FROM LOCAL PC
 $result = curl_exec($handle);
 $code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 $result = json_decode($result);
+
 if ($result) {
     if (!empty($SESSION->wantsurl)) {
         $destination = $SESSION->wantsurl;
@@ -120,10 +121,12 @@ if ($result) {
             $data);
         die;
     }
+
     $validation = $DB->get_record('enrol_sslcommerz', array('txn_id' => $result->tran_id));
+
     // Make sure this transaction doesn't exist already.
-    if ($existing = $DB->get_record("enrol_sslcommerz", array("txn_id" => $result->txn_id), "*", MUST_EXIST)) {
-        \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Transaction $result->txn_id is being repeated!", $data);
+    if (!$existing = $DB->get_record("enrol_sslcommerz", array("txn_id" => $result->tran_id), "*", MUST_EXIST)) {
+        \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Transaction $result->tran_id is being repeated!", $data);
         die;
     }
     if (!$user = $DB->get_record('user', array('id' => $data->userid))) {   // Check that user exists
@@ -131,6 +134,7 @@ if ($result) {
         redirect($destination, get_string('usermissing', 'enrol_sslcommerz', $data->userid));
         die;
     }
+
     if (!$course = $DB->get_record('course', array('id' => $data->courseid))) { // Check that course exists
         \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Course $data->courseid doesn't exist", $data);
         redirect($destination, get_string('coursemissing', 'enrol_sslcommerz', $data->courseid));
@@ -144,7 +148,7 @@ if ($result) {
     // Use the same rounding of floats as on the enrol form.
     $cost = format_float($cost, 2, false);
     if ($result->amount < $cost) {
-        \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Amount paid is not enough ($data->payment_gross < $cost))", $data);
+        \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Amount paid is not enough ($result->amount < $cost))", $data);
         redirect($destination, get_string('paymendue', 'enrol_sslcommerz', $result->amount));
         die;
     }
@@ -160,7 +164,7 @@ if ($result) {
         $timeend = 0;
     }
     $data->id = $validation->id;
-    if ($result->status == 'Pending' || $result->status == 'Processing') {
+    if ($result->status == 'Pending' || $result->status == 'Processing'|| $result->status == 'VALID') {
         if ($validation) {
             $data->payment_status = 'Processing';
             $record = $DB->update_record("enrol_sslcommerz", $data, $bulk = false);
@@ -259,6 +263,7 @@ if ($result) {
             redirect($destination, get_string('paymentfail', 'enrol_sslcommerz', $fullname));
         }
     } else { // status is something else
+
         $data->payment_status = 'Invalid';
         $record = $DB->update_record("enrol_sslcommerz", $data, $bulk = false);
         $log = $DB->insert_record("enrol_sslcommerz_log", $data);

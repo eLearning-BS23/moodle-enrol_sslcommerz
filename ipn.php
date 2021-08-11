@@ -142,7 +142,7 @@ if ($result) {
     $validation = $DB->get_record('enrol_sslcommerz', array('txn_id' => $result->tran_id));
 
     // Make sure this transaction doesn't exist already.
-    if ($existing = $DB->get_record("enrol_sslcommerz", array("txn_id" => $data->txn_id), "*", IGNORE_MULTIPLE)) {
+    if (!$existing = $DB->get_record("enrol_sslcommerz", array("txn_id" => $data->txn_id), "*", IGNORE_MULTIPLE)) {
         \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Transaction $data->txn_id is being repeated!", $data);
         die;
     }
