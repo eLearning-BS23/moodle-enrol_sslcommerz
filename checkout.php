@@ -33,10 +33,10 @@ $postdata['store_passwd'] = get_config('enrol_sslcommerz')->sslstorepassword;
 $postdata['total_amount'] = $_POST['amount'];
 $postdata['currency'] = $_POST['currency_code'];
 $postdata['tran_id'] = "MD_COURSE_" . uniqid();
-$postdata['success_url'] = $CFG->wwwroot . "/enrol/sslcommerz/ipn.php?id=".$_POST['course_id'];
+$postdata['success_url'] = $CFG->wwwroot . "/enrol/sslcommerz/success.php?id=".$_POST['course_id'];
 $postdata['fail_url'] = $CFG->wwwroot . "/enrol/sslcommerz/fail.php?id=".$_POST['course_id'];
 $postdata['cancel_url'] = $CFG->wwwroot . "/enrol/sslcommerz/cancel.php?id=".$_POST['course_id'];
-$postdata['ipn_url'] = $CFG->wwwroot . "/enrol/sslcommerz/success.php?id=".$_POST['course_id'];
+$postdata['ipn_url'] = $CFG->wwwroot . "/enrol/sslcommerz/ipn.php?id=".$_POST['course_id'];
 
 $postdata['cus_name'] = $_POST['os0'];
 $postdata['cus_email'] = $_POST['email'];
