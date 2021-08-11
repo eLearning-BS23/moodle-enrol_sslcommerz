@@ -38,7 +38,7 @@ global $CFG, $USER;
 
 // Disable moodle specific debug messages and any errors in output,
 // comment out when debugging or better look into error log!
-define('NO_DEBUG_DISPLAY', true);
+//define('NO_DEBUG_DISPLAY', true);
 
 // PayPal does not like when we return error messages here,
 // the custom handler just logs exceptions and stops.
@@ -122,8 +122,8 @@ if ($result) {
     }
     $validation = $DB->get_record('enrol_sslcommerz', array('txn_id' => $result->tran_id));
     // Make sure this transaction doesn't exist already.
-    if ($existing = $DB->get_record("enrol_sslcommerz", array("txn_id" => $data->txn_id), "*", IGNORE_MULTIPLE)) {
-        \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Transaction $data->txn_id is being repeated!", $data);
+    if ($existing = $DB->get_record("enrol_sslcommerz", array("txn_id" => $result->txn_id), "*", MUST_EXIST)) {
+        \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Transaction $result->txn_id is being repeated!", $data);
         die;
     }
     if (!$user = $DB->get_record('user', array('id' => $data->userid))) {   // Check that user exists
