@@ -1,100 +1,101 @@
 <?php
-require("../../config.php");
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * This script is used to configure and execute the course copy proccess.
+ *
+ * @package    core_backup
+ * @copyright  2020 onward The Moodle Users Association <https://moodleassociation.org/>
+ * @author     Matt Porritt <mattp@catalyst-au.net>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+require("../../config.php");
 global $CFG, $USER;
 /* PHP */
 
-$post_data = array();
-$post_data['store_id'] = get_config('enrol_sslcommerz')->sslstoreid;
-$post_data['store_passwd'] = get_config('enrol_sslcommerz')->sslstorepassword;
-$post_data['total_amount'] = $_POST['amount'];
-$post_data['currency'] = "BDT";
-$post_data['tran_id'] = "SSLCZ_TEST_".uniqid();
-$post_data['success_url'] = $CFG->wwwroot."/enrol/sslcommerz/return.php?id=".$_POST['course_id']."&user_id=".$_POST['user_id']."&instance=".$_POST['instance_id'];
-$post_data['fail_url'] = $CFG->wwwroot."/enrol/sslcommerz/fail.php";
-$post_data['cancel_url'] = $CFG->wwwroot."/enrol/sslcommerz/cancel.php";
-$post_data['ipn_url'] = $CFG->wwwroot."/enrol/sslcommerz/ipn.php";
-# $post_data['multi_card_name'] = "mastercard,visacard,amexcard";  # DISABLE TO DISPLAY ALL AVAILABLE
+$postdata = array();
+$postdata['store_id'] = get_config('enrol_sslcommerz')->sslstoreid;
+$postdata['store_passwd'] = get_config('enrol_sslcommerz')->sslstorepassword;
+$postdata['total_amount'] = $_POST['amount'];
+$postdata['currency'] = $_POST['currency_code'];
+$postdata['tran_id'] = "MD_COURSE_" . uniqid();
+$postdata['success_url'] = $CFG->wwwroot . "/enrol/sslcommerz/success.php?id=".$_POST['course_id'];
+$postdata['fail_url'] = $CFG->wwwroot . "/enrol/sslcommerz/fail.php?id=".$_POST['course_id'];
+$postdata['cancel_url'] = $CFG->wwwroot . "/enrol/sslcommerz/cancel.php?id=".$_POST['course_id'];
+$postdata['ipn_url'] = $CFG->wwwroot . "/enrol/sslcommerz/ipn.php?id=".$_POST['course_id'];
 
-# EMI INFO
-// $post_data['emi_option'] = "1";
-// $post_data['emi_max_inst_option'] = "9";
-// $post_data['emi_selected_inst'] = "9";
+$postdata['cus_name'] = $_POST['os0'];
+$postdata['cus_email'] = $_POST['email'];
+$postdata['cus_add1'] = $_POST['address'];
+$postdata['cus_add2'] = "";
+$postdata['cus_city'] = $_POST['city'];
+$postdata['cus_state'] = "";
+$postdata['cus_postcode'] = "1000";
+$postdata['cus_country'] = $_POST['country'];
+$postdata['cus_phone'] = "";
+$postdata['cus_fax'] = "";
 
-# CUSTOMER INFORMATION
-$post_data['cus_name'] = $_POST['os0'];
-$post_data['cus_email'] = $_POST['email'];
-$post_data['cus_add1'] = $_POST['address'];
-$post_data['cus_add2'] = "";
-$post_data['cus_city'] = $_POST['city'];
-$post_data['cus_state'] = "";
-$post_data['cus_postcode'] = "1000";
-$post_data['cus_country'] = $_POST['country'];
-$post_data['cus_phone'] = "";
-$post_data['cus_fax'] = "";
-
-# SHIPMENT INFORMATION
-// $post_data['ship_name'] = "testtestcsbh5";
-// $post_data['ship_add1 '] = "Dhaka";
-// $post_data['ship_add2'] = "Dhaka";
-// $post_data['ship_city'] = "Dhaka";
-// $post_data['ship_state'] = "Dhaka";
-// $post_data['ship_postcode'] = "1000";
-// $post_data['ship_country'] = "Bangladesh";
-
-# OPTIONAL PARAMETERS
- $post_data['value_a'] = $_POST['custom'];
- $post_data['value_b '] = "ref002";
- $post_data['value_c'] = "ref003";
- $post_data['value_d'] = "ref004";
-
-# CART PARAMETERS
-// $post_data['cart'] = json_encode(array(
-//     array("product"=>"DHK TO BRS AC A1","amount"=>"200.00"),
-//     array("product"=>"DHK TO BRS AC A2","amount"=>"200.00"),
-//     array("product"=>"DHK TO BRS AC A3","amount"=>"200.00"),
-//     array("product"=>"DHK TO BRS AC A4","amount"=>"200.00")
-// ));
-// $post_data['product_amount'] = "100";
-// $post_data['vat'] = "5";
-// $post_data['discount_amount'] = "5";
-// $post_data['convenience_fee'] = "3";
+// # OPTIONAL PARAMETERS
+$postdata['value_a'] = $_POST['custom'];
+$postdata['value_b'] = $_POST['course_id'];
+$postdata['value_c'] = $_POST['user_id'];
+$postdata['value_d'] = $_POST['instance_id'];
 
 
-# REQUEST SEND TO SSLCOMMERZ
-$direct_api_url = "https://sandbox.sslcommerz.com/gwprocess/v3/api.php";
+$data = new stdClass();
 
+$data->userid           = (int)$_POST['user_id'];
+$data->courseid         = (int)$_POST['course_id'];
+$data->instanceid       = (int)$_POST['instance_id'];
+$data->payment_currency = $_POST['currency_code'];
+$data->payment_status   = 'Pending';
+$data->txn_id           = $postdata['tran_id'];
+$data->timeupdated      = time();
+
+$DB->insert_record("enrol_sslcommerz", $data);
+
+
+// # REQUEST SEND TO SSLCOMMERZ
+$direct_api_url = get_config("enrol_sslcommerz")->apiurl;
 $handle = curl_init();
-curl_setopt($handle, CURLOPT_URL, $direct_api_url );
+curl_setopt($handle, CURLOPT_URL, $direct_api_url);
 curl_setopt($handle, CURLOPT_TIMEOUT, 30);
 curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 30);
-curl_setopt($handle, CURLOPT_POST, 1 );
-curl_setopt($handle, CURLOPT_POSTFIELDS, $post_data);
+curl_setopt($handle, CURLOPT_POST, 1);
+curl_setopt($handle, CURLOPT_POSTFIELDS, $postdata);
 curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, FALSE); # KEEP IT FALSE IF YOU RUN FROM LOCAL PC
-
-
-$content = curl_exec($handle );
-
+curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false); # KEEP IT FALSE IF YOU RUN FROM LOCAL PC
+$content = curl_exec($handle);
 $code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-
-if($code == 200 && !( curl_errno($handle))) {
-    curl_close( $handle);
+if ($code == 200 && !(curl_errno($handle))) {
+    curl_close($handle);
     $sslcommerzResponse = $content;
 } else {
-    curl_close( $handle);
+    curl_close($handle);
     echo "FAILED TO CONNECT WITH SSLCOMMERZ API";
     exit;
 }
-
-# PARSE THE JSON RESPONSE
-$sslcz = json_decode($sslcommerzResponse, true );
-
-if(isset($sslcz['GatewayPageURL']) && $sslcz['GatewayPageURL']!="" ) {
-    # THERE ARE MANY WAYS TO REDIRECT - Javascript, Meta Tag or Php Header Redirect or Other
-    # echo "<script>window.location.href = '". $sslcz['GatewayPageURL'] ."';</script>";
-    echo "<meta http-equiv='refresh' content='0;url=".$sslcz['GatewayPageURL']."'>";
-    # header("Location: ". $sslcz['GatewayPageURL']);
+// # PARSE THE JSON RESPONSE
+$sslcz = json_decode($sslcommerzResponse, true);
+if (isset($sslcz['GatewayPageURL']) && $sslcz['GatewayPageURL'] != "") {
+    // # THERE ARE MANY WAYS TO REDIRECT - Javascript, Meta Tag or Php Header Redirect or Other
+    // # echo "<script>window.location.href = '". $sslcz['GatewayPageURL'] ."';</script>";
+    echo "<meta http-equiv='refresh' content='0;url=" . $sslcz['GatewayPageURL'] . "'>";
+    // # header("Location: ". $sslcz['GatewayPageURL']);
     exit;
 } else {
     echo "JSON Data parsing error!";

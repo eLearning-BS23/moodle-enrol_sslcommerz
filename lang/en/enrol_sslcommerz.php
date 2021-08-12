@@ -94,3 +94,16 @@ $string['status'] = 'Allow sslcommerz enrolments';
 $string['status_desc'] = 'Allow users to use sslcommerz to enrol into a course by default.';
 $string['transactions'] = 'sslcommerz transactions';
 $string['unenrolselfconfirm'] = 'Do you really want to unenrol yourself from course "{$a}"?';
+$string['paymendue'] = 'Amount paid is not enough "{$a}"?';
+$string['coursemissing'] = 'Course "{$a}" doesn\'t exist';
+$string['usermissing'] = 'User {$a} doesn\'t exist';
+$string['pluginname'] = 'sslcommerz';
+$string['paymenterror'] = 'Error updating record: Something went wrong';
+$string['paymentfail'] = 'Payment was not valid. Please contact with the merchant.';
+$string['paymentinvalid'] = 'Invalid Information.';
+$string['apiurl_desc'] = 'sslcommerz Api v3 url';
+$string['apiurl'] = 'Api Url';
+$string['requestedurl'] = 'Requested Url';
+$string['requestedurl_desc'] = 'Requested Url Without parameter';
+$string['course'] = 'Course';
+

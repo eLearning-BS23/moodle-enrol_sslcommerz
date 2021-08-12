@@ -30,11 +30,11 @@
 
 define('CLI_SCRIPT', true);
 
-require(__DIR__.'/../../../config.php');
+require(__DIR__ . '/../../../config.php');
 require_once("$CFG->libdir/clilib.php");
 
 // Now get cli options.
-list($options, $unrecognized) = cli_get_params(array('verbose'=>false, 'help'=>false), array('v'=>'verbose', 'h'=>'help'));
+list($options, $unrecognized) = cli_get_params(array('verbose' => false, 'help' => false), array('v' => 'verbose', 'h' => 'help'));
 
 if ($unrecognized) {
     $unrecognized = implode("\n  ", $unrecognized);
@@ -58,7 +58,7 @@ Example:
 }
 
 if (!enrol_is_enabled('sslcommerz')) {
-    echo('enrol_sslcommerz plugin is disabled'."\n");
+    echo('enrol_sslcommerz plugin is disabled' . "\n");
     exit(2);
 }
 
@@ -68,7 +68,7 @@ if (empty($options['verbose'])) {
     $trace = new text_progress_trace();
 }
 
-/** @var $plugin enrol_sslcommerz_plugin */
+// @var $plugin enrol_sslcommerz_plugin
 $plugin = enrol_get_plugin('sslcommerz');
 
 $result = $plugin->sync($trace);
