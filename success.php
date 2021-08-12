@@ -111,6 +111,7 @@ $code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 $result = json_decode($result);
 
 if ($result) {
+    $data->payment_status = $result->status;
     if (!empty($SESSION->wantsurl)) {
         $destination = $SESSION->wantsurl;
         unset($SESSION->wantsurl);
@@ -171,7 +172,7 @@ if ($result) {
     $data->id = $validation->id;
     if ($result->status == 'Pending' || $result->status == 'Processing'|| $result->status == 'VALID') {
         if ($validation) {
-            $data->payment_status = 'Processing';
+
             $record = $DB->update_record("enrol_sslcommerz", $data, $bulk = false);
             $log = $DB->insert_record("enrol_sslcommerz_log", $data);
             if ($record) {
@@ -262,20 +263,18 @@ if ($result) {
                 redirect($destination, get_string('paymenterror', 'enrol_sslcommerz', $fullname));
             }
         } else { // $validated is false
-            $data->payment_status = 'Failed';
+
             $record = $DB->update_record("enrol_sslcommerz", $data, $bulk = false);
             $log = $DB->insert_record("enrol_sslcommerz_log", $data);
             redirect($destination, get_string('paymentfail', 'enrol_sslcommerz', $fullname));
         }
     } else { // status is something else
 
-        $data->payment_status = 'Invalid';
         $record = $DB->update_record("enrol_sslcommerz", $data, $bulk = false);
         $log = $DB->insert_record("enrol_sslcommerz_log", $data);
         redirect($destination, get_string('paymentinvalid', 'enrol_sslcommerz', $fullname));
     }
 } else {// ERROR
-    $data->payment_status = 'Invalid';
     $record = $DB->update_record("enrol_sslcommerz", $data, $bulk = false);
     $log = $DB->insert_record("enrol_sslcommerz_log", $data);
     throw new moodle_exception('erripninvalid', 'enrol_sslcommerz', '', null, json_encode($data));

@@ -23,12 +23,42 @@
  */
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once(dirname(__FILE__) . '/lib.php');
+require_once("$CFG->dirroot/enrol/sslcommerz/lib.php");
 
+global $CFG, $USER;
 
 $courseid = required_param('id', PARAM_INT);
 
-$course = $DB->get_record("course", array("id" => $courseid), "*", MUST_EXIST);
+$data = new stdClass();
+// check custom data requested from  ssl
+if (empty($_POST['value_a'])) {
+    throw new moodle_exception('invalidrequest', 'core_error', '', null, 'Missing request param: custom');
+}
+$custom = explode('-', $_POST['value_a']);
+//check custom data is valid
+if (empty($custom) || count($custom) < 3) {
+    throw new moodle_exception('invalidrequest', 'core_error', '', null, 'Invalid value of the request param: custom');
+}
+$data->userid = (int)$custom[0];
+$data->courseid = (int)$custom[1];
+$data->instanceid = (int)$custom[2];
+$data->payment_currency = $_POST['currency'];
+$data->timeupdated = time();
+$data->receiver_email =$USER->email;
+$data->receiver_id = $USER->id;
+$data->payment_status = $_POST['status'];
+$course = $DB->get_record("course", array("id" => $data->courseid), "*", MUST_EXIST);
+
+$data->item_name = $course->fullname;
+
+
+$validation = $DB->get_record('enrol_sslcommerz', array('txn_id' => $_POST['tran_id']));
+
+$data->id = $validation->id;
+
+$record = $DB->update_record("enrol_sslcommerz", $data, $bulk = false);
+$log = $DB->insert_record("enrol_sslcommerz_log", $data);
+
 $context = context_course::instance($course->id, MUST_EXIST);
 
 $PAGE->set_context($context);
@@ -46,10 +76,10 @@ $url = new moodle_url(
 
 //$PAGE->set_url($url);
 $PAGE->set_pagelayout('course');
-$PAGE->set_title($course->shortname . ': ' . get_string('pluginname', 'quizaccess_proctoring'));
-$PAGE->set_heading($course->fullname . ': ' . get_string('pluginname', 'quizaccess_proctoring'));
+$PAGE->set_title($course->shortname . ': ' . get_string('pluginname', 'enrol_sslcommerz'));
+$PAGE->set_heading($course->fullname . ': ' . get_string('pluginname', 'enrol_sslcommerz'));
 
-$PAGE->navbar->add(get_string('course', 'course'), $url);
+$PAGE->navbar->add(get_string('course', 'enrol_sslcommerz'), $url);
 
 echo $OUTPUT->header();
 
