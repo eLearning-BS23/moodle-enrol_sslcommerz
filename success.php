@@ -59,7 +59,7 @@ $req = 'cmd=_notify-validate';
 
 
 $data = new stdClass();
-
+//serialize all response in data
 foreach ($_POST as $key => $value) {
     if ($key !== clean_param($key, PARAM_ALPHANUMEXT)) {
         throw new moodle_exception('invalidrequest', 'core_error', '', null, $key);
@@ -70,10 +70,12 @@ foreach ($_POST as $key => $value) {
     $req .= "&$key=" . urlencode($value);
     $data->$key = fix_utf8($value);
 }
+// check custom data requested from  ssl
 if (empty($_POST['value_a'])) {
     throw new moodle_exception('invalidrequest', 'core_error', '', null, 'Missing request param: custom');
 }
 $custom = explode('-', $_POST['value_a']);
+//check custom data is valid
 if (empty($custom) || count($custom) < 3) {
     throw new moodle_exception('invalidrequest', 'core_error', '', null, 'Invalid value of the request param: custom');
 }
@@ -82,8 +84,11 @@ $data->courseid = (int)$custom[1];
 $data->instanceid = (int)$custom[2];
 $data->payment_currency = $data->currency;
 $data->timeupdated = time();
+// check user exist or not
 $user = $DB->get_record("user", array("id" => $data->userid), "*", MUST_EXIST);
+// check course exist or not
 $course = $DB->get_record("course", array("id" => $data->courseid), "*", MUST_EXIST);
+
 $context = context_course::instance($course->id, MUST_EXIST);
 $PAGE->set_context($context);
 $plugin_instance = $DB->get_record("enrol", array("id" => $data->instanceid, "enrol" => "sslcommerz", "status" => 0), "*", MUST_EXIST);
@@ -121,7 +126,7 @@ if ($result) {
             $data);
         die;
     }
-
+    // check this transection id is valid or not
     $validation = $DB->get_record('enrol_sslcommerz', array('txn_id' => $result->tran_id));
 
     // Make sure this transaction doesn't exist already.
@@ -270,7 +275,9 @@ if ($result) {
         redirect($destination, get_string('paymentinvalid', 'enrol_sslcommerz', $fullname));
     }
 } else {// ERROR
-    $DB->insert_record("enrol_sslcommerz", $data, false);
+    $data->payment_status = 'Invalid';
+    $record = $DB->update_record("enrol_sslcommerz", $data, $bulk = false);
+    $log = $DB->insert_record("enrol_sslcommerz_log", $data);
     throw new moodle_exception('erripninvalid', 'enrol_sslcommerz', '', null, json_encode($data));
 }
 
