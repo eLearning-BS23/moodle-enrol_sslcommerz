@@ -29,6 +29,10 @@ You can download zip file and install or you can put file under enrol as sslcomm
 ```
   Dashboard->Site administration->Plugins->Enrolments->sslcommerz settings
 ```
+- Insert the SSLCOMMERZ api v3 url
+  https://sandbox.sslcommerz.com/gwprocess/v3/api.php
+- Insert sslcommerz validetion url 
+  https://sandbox.sslcommerz.com/validator/api/validationserverAPI.php
 - Insert the Store id that provided by sslcommerz
 - Insert Store Password provided by sslcommerz
 - Done!
@@ -46,7 +50,7 @@ then update the IPN at HTTP Listener
   
 
 <p align="center">
-<img src="https://i.imgur.com/4TrsLso.png?1">
+<img src="https://i.imgur.com/Tc0Bx9p.png">
 </p>
 
 <p align="center">
