@@ -105,4 +105,5 @@ $string['apiurl_desc'] = 'sslcommerz Api v3 url';
 $string['apiurl'] = 'Api Url';
 $string['requestedurl'] = 'Requested Url';
 $string['requestedurl_desc'] = 'Requested Url Without parameter';
+$string['course'] = 'Course';
 

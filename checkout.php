@@ -62,7 +62,7 @@ $data->userid           = (int)$_POST['user_id'];
 $data->courseid         = (int)$_POST['course_id'];
 $data->instanceid       = (int)$_POST['instance_id'];
 $data->payment_currency = $_POST['currency_code'];
-$data->payment_status   = 'APPLY';
+$data->payment_status   = 'Pending';
 $data->txn_id           = $postdata['tran_id'];
 $data->timeupdated      = time();
 

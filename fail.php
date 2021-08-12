@@ -1,5 +1,5 @@
 <?php
-// This file is part of the Zoom plugin for Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,15 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * AWS webgl module version info
+ * sslcommerz enrolments plugin settings and presets.
  *
- * @package mod_webgl
- * @copyright  2020 Brain station 23 ltd <>  {@link https://brainstation-23.com/}
+ * @package    enrol_sslcommerz
+ * @copyright  2021 Brain station 23 ltd.
+ * @author     Brain station 23 ltd.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once("$CFG->dirroot/enrol/sslcommerz/lib.php");
+Srequire_once("$CFG->dirroot/enrol/sslcommerz/lib.php");
 
 global $CFG, $USER;
 

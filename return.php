@@ -14,7 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * sslcommerz enrolments plugin settings and presets.
+ *
+ * @package    enrol_sslcommerz
+ * @copyright  2021 Brain station 23 ltd.
+ * @author     Brain station 23 ltd.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
 require("../../config.php");
+
 use mod_lti\local\ltiservice\response;
 
 global $CFG, $USER;
