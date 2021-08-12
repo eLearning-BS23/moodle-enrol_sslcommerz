@@ -32,6 +32,7 @@
 // comment out when debugging or better look into error log!
 define('NO_DEBUG_DISPLAY', true);
 
+
 // @codingStandardsIgnoreLine This script does not require login.
 require("../../config.php");
 require_once("lib.php");
@@ -117,6 +118,7 @@ $code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 
 $result = json_decode($result);
 
+
 if ($result) {
 
     if (!empty($SESSION->wantsurl)) {
@@ -139,11 +141,12 @@ if ($result) {
         die;
     }
 
+
     $validation = $DB->get_record('enrol_sslcommerz', array('txn_id' => $result->tran_id));
 
     // Make sure this transaction doesn't exist already.
-    if (!$existing = $DB->get_record("enrol_sslcommerz", array("txn_id" => $data->txn_id), "*", IGNORE_MULTIPLE)) {
-        \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Transaction $data->txn_id is being repeated!", $data);
+    if (!$existing = $DB->get_record("enrol_sslcommerz", array("txn_id" => $result->tran_id), "*", IGNORE_MULTIPLE)) {
+        \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Transaction $result->tran_id is being repeated!", $data);
         die;
     }
 
@@ -441,9 +444,10 @@ if ($result) {
             if ($validation) {
 
                 $data->id = $validation->id;
-                $data->payment_status = 'Pending';
+                $data->payment_status = 'Success';
                 $entry = $DB->update_record("enrol_sslcommerz", $data, $bulk = false);
                 $DB->insert_record("enrol_sslcommerz_log", $data, $bulk = false);
+
                 if ($entry) {
                     if ($plugin_instance->enrolperiod) {
                         $timestart = time();
