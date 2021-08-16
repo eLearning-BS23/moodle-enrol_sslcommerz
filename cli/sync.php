@@ -68,7 +68,7 @@ if (empty($options['verbose'])) {
     $trace = new text_progress_trace();
 }
 
-// @var $plugin enrol_sslcommerz_plugin
+/** @var $plugin enrol_sslcommerz_plugin */
 $plugin = enrol_get_plugin('sslcommerz');
 
 $result = $plugin->sync($trace);

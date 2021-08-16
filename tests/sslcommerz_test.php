@@ -26,35 +26,16 @@
 defined('MOODLE_INTERNAL') || die();
 
 
-class enrol_sslcommerz_testcase extends advanced_testcase
-{
+class enrol_sslcommerz_testcase extends advanced_testcase {
 
-    protected function enable_plugin()
-    {
-        $enabled = enrol_get_plugins(true);
-        $enabled['sslcommerz'] = true;
-        $enabled = array_keys($enabled);
-        set_config('enrol_plugins_enabled', implode(',', $enabled));
-    }
-
-    protected function disable_plugin()
-    {
-        $enabled = enrol_get_plugins(true);
-        unset($enabled['sslcommerz']);
-        $enabled = array_keys($enabled);
-        set_config('enrol_plugins_enabled', implode(',', $enabled));
-    }
-
-    public function test_basics()
-    {
+    public function test_basics() {
         $this->assertFalse(enrol_is_enabled('sslcommerz'));
         $plugin = enrol_get_plugin('sslcommerz');
         $this->assertInstanceOf('enrol_sslcommerz_plugin', $plugin);
         $this->assertEquals(ENROL_EXT_REMOVED_SUSPENDNOROLES, get_config('enrol_sslcommerz', 'expiredaction'));
     }
 
-    public function test_sync_nothing()
-    {
+    public function test_sync_nothing() {
         $this->resetAfterTest();
 
         $this->enable_plugin();
@@ -64,8 +45,14 @@ class enrol_sslcommerz_testcase extends advanced_testcase
         $sslcommerzplugin->sync(new null_progress_trace());
     }
 
-    public function test_expired()
-    {
+    protected function enable_plugin() {
+        $enabled = enrol_get_plugins(true);
+        $enabled['sslcommerz'] = true;
+        $enabled = array_keys($enabled);
+        set_config('enrol_plugins_enabled', implode(',', $enabled));
+    }
+
+    public function test_expired() {
         global $DB;
         $this->resetAfterTest();
 
@@ -143,18 +130,22 @@ class enrol_sslcommerz_testcase extends advanced_testcase
         $this->assertEquals(9, $DB->count_records('user_enrolments'));
         $this->assertEquals(9, $DB->count_records('role_assignments'));
 
-
         $sslcommerzplugin->set_config('expiredaction', ENROL_EXT_REMOVED_SUSPENDNOROLES);
         $sslcommerzplugin->sync($trace);
         $this->assertEquals(9, $DB->count_records('user_enrolments'));
         $this->assertEquals(6, $DB->count_records('role_assignments'));
-        $this->assertEquals(4, $DB->count_records('role_assignments', array('roleid' => $studentrole->id)));
-        $this->assertEquals(1, $DB->count_records('role_assignments', array('roleid' => $teacherrole->id)));
-        $this->assertFalse($DB->record_exists('role_assignments', array('contextid' => $context1->id, 'userid' => $user3->id, 'roleid' => $studentrole->id)));
-        $this->assertFalse($DB->record_exists('role_assignments', array('contextid' => $context2->id, 'userid' => $user2->id, 'roleid' => $studentrole->id)));
-        $this->assertFalse($DB->record_exists('role_assignments', array('contextid' => $context2->id, 'userid' => $user1->id, 'roleid' => $teacherrole->id)));
-        $this->assertTrue($DB->record_exists('role_assignments', array('contextid' => $context2->id, 'userid' => $user1->id, 'roleid' => $studentrole->id)));
-
+        $this->assertEquals(4, $DB->count_records('role_assignments',
+            array('roleid' => $studentrole->id)));
+        $this->assertEquals(1, $DB->count_records('role_assignments',
+            array('roleid' => $teacherrole->id)));
+        $this->assertFalse($DB->record_exists('role_assignments',
+            array('contextid' => $context1->id, 'userid' => $user3->id, 'roleid' => $studentrole->id)));
+        $this->assertFalse($DB->record_exists('role_assignments',
+            array('contextid' => $context2->id, 'userid' => $user2->id, 'roleid' => $studentrole->id)));
+        $this->assertFalse($DB->record_exists('role_assignments',
+            array('contextid' => $context2->id, 'userid' => $user1->id, 'roleid' => $teacherrole->id)));
+        $this->assertTrue($DB->record_exists('role_assignments',
+            array('contextid' => $context2->id, 'userid' => $user1->id, 'roleid' => $studentrole->id)));
 
         $sslcommerzplugin->set_config('expiredaction', ENROL_EXT_REMOVED_UNENROL);
         role_assign($studentrole->id, $user3->id, $context1->id);
@@ -177,8 +168,7 @@ class enrol_sslcommerz_testcase extends advanced_testcase
     /**
      * Test for getting user enrolment actions.
      */
-    public function test_get_user_enrolment_actions()
-    {
+    public function test_get_user_enrolment_actions() {
         global $CFG, $PAGE;
         $this->resetAfterTest();
 
@@ -229,5 +219,12 @@ class enrol_sslcommerz_testcase extends advanced_testcase
         $actions = $plugin->get_user_enrolment_actions($manager, $ue);
         // Teachers don't have the enrol/sslcommerz:unenrol capability by default, but have enrol/sslcommerz:manage.
         $this->assertCount(1, $actions);
+    }
+
+    protected function disable_plugin() {
+        $enabled = enrol_get_plugins(true);
+        unset($enabled['sslcommerz']);
+        $enabled = array_keys($enabled);
+        set_config('enrol_plugins_enabled', implode(',', $enabled));
     }
 }

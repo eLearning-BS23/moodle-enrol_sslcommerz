@@ -23,7 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-//defined('MOODLE_INTERNAL') || die();
+require_login($course, true, $cm);
 
 use mod_lti\local\ltiservice\response;
 
@@ -34,7 +34,7 @@ global $CFG, $USER;
 
 // Disable moodle specific debug messages and any errors in output,
 // comment out when debugging or better look into error log!
-//define('NO_DEBUG_DISPLAY', true);
+// define('NO_DEBUG_DISPLAY', true).
 
 // PayPal does not like when we return error messages here,
 // the custom handler just logs exceptions and stops.
@@ -47,7 +47,7 @@ if (!enrol_is_enabled('sslcommerz')) {
 }
 
 $data = new stdClass();
-//serialize all response in data
+// Serialize all response in data.
 foreach ($_POST as $key => $value) {
     if ($key !== clean_param($key, PARAM_ALPHANUMEXT)) {
         throw new moodle_exception('invalidrequest', 'core_error', '', null, $key);
@@ -59,14 +59,14 @@ foreach ($_POST as $key => $value) {
     $data->$key = fix_utf8($value);
 }
 
-// check custom data requested from  ssl
+// Check custom data requested from ssl.
 if (empty($_POST['value_a'])) {
     throw new moodle_exception('invalidrequest', 'core_error', '', null, 'Missing request param: custom');
 }
 
 $custom = explode('-', $_POST['value_a']);
 
-//check custom data is valid
+// Check custom data is valid.
 if (empty($custom) || count($custom) < 3) {
     throw new moodle_exception('invalidrequest', 'core_error', '', null, 'Invalid value of the request param: custom');
 }
@@ -79,28 +79,31 @@ $data->receiver_email = $USER->email;
 $data->receiver_id = $USER->id;
 $data->timeupdated = time();
 
-// check user exist or not
+// Check user exist or not.
 $user = $DB->get_record("user", array("id" => $data->userid), "*", MUST_EXIST);
 
-// check course exist or not
+// Check course exist or not.
 $course = $DB->get_record("course", array("id" => $data->courseid), "*", MUST_EXIST);
 
 $context = context_course::instance($course->id, MUST_EXIST);
 $PAGE->set_context($context);
-$plugin_instance = $DB->get_record("enrol", array("id" => $data->instanceid, "enrol" => "sslcommerz", "status" => 0), "*", MUST_EXIST);
+$plugininstance =
+    $DB->get_record("enrol", array("id" => $data->instanceid, "enrol" => "sslcommerz", "status" => 0), "*", MUST_EXIST);
 $plugin = enrol_get_plugin('sslcommerz');
 
-/// Open a connection back to SSLCommerz to validate the data
+// Open a connection back to SSLCommerz to validate the data.
 $valid = urlencode($_POST['val_id']);
 $storeid = urlencode(get_config('enrol_sslcommerz')->sslstoreid);
 $storepasswd = urlencode(get_config('enrol_sslcommerz')->sslstorepassword);
-$requested_url = (get_config("enrol_sslcommerz")->requestedurl . "?val_id=" . $valid . "&store_id=" . $storeid . "&store_passwd=" . $storepasswd . "&v=1&format=json");
+$requestedurl =
+    (get_config("enrol_sslcommerz")->requestedurl
+        . "?val_id=" . $valid . "&store_id=" . $storeid . "&store_passwd=" . $storepasswd . "&v=1&format=json");
 
 $handle = curl_init();
-curl_setopt($handle, CURLOPT_URL, $requested_url);
+curl_setopt($handle, CURLOPT_URL, $requestedurl);
 curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false); # IF YOU RUN FROM LOCAL PC
-curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false); # IF YOU RUN FROM LOCAL PC
+curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false); // IF YOU RUN FROM LOCAL PC.
+curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false); // IF YOU RUN FROM LOCAL PC.
 
 $result = curl_exec($handle);
 $code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
@@ -123,14 +126,14 @@ if ($result) {
     $currency = $_POST['currency'];
 
     if (empty($_POST['amount']) || empty($_POST['currency'])) {
-        $plugin->unenrol_user($plugin_instance, $data->userid);
+        $plugin->unenrol_user($plugininstance, $data->userid);
         \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Invalid Information.",
             $data);
         die;
     }
 
 
-    // check this transection id is valid or not
+    // Check this transection id is valid or not.
     $validation = $DB->get_record('enrol_sslcommerz', array('txn_id' => $result->tran_id));
 
     // Make sure this transaction doesn't exist already.
@@ -139,22 +142,22 @@ if ($result) {
         die;
     }
 
-    if (!$user = $DB->get_record('user', array('id' => $data->userid))) {   // Check that user exists
+    if (!$user = $DB->get_record('user', array('id' => $data->userid))) {   // Check that user exists.
         \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("User $data->userid doesn't exist", $data);
         redirect($destination, get_string('usermissing', 'enrol_sslcommerz', $data->userid));
         die;
     }
 
-    if (!$course = $DB->get_record('course', array('id' => $data->courseid))) { // Check that course exists
+    if (!$course = $DB->get_record('course', array('id' => $data->courseid))) { // Check that course exists.
         \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Course $data->courseid doesn't exist", $data);
         redirect($destination, get_string('coursemissing', 'enrol_sslcommerz', $data->courseid));
         die;
     }
 
-    if ((float)$plugin_instance->cost <= 0) {
+    if ((float)$plugininstance->cost <= 0) {
         $cost = (float)$plugin->get_config('cost');
     } else {
-        $cost = (float)$plugin_instance->cost;
+        $cost = (float)$plugininstance->cost;
     }
 
     // Use the same rounding of floats as on the enrol form.
@@ -170,9 +173,9 @@ if ($result) {
     $data->id = $validation->id;
     $coursecontext = context_course::instance($course->id, IGNORE_MISSING);
 
-    if ($plugin_instance->enrolperiod) {
+    if ($plugininstance->enrolperiod) {
         $timestart = time();
-        $timeend = $timestart + $plugin_instance->enrolperiod;
+        $timeend = $timestart + $plugininstance->enrolperiod;
     } else {
         $timestart = 0;
         $timeend = 0;
@@ -187,9 +190,9 @@ if ($result) {
         $log = $DB->insert_record("enrol_sslcommerz_log", $data);
 
 
-        // Enrol user
-        $plugin->enrol_user($plugin_instance, $user->id, $plugin_instance->roleid, $timestart, $timeend);
-        // Pass $view=true to filter hidden caps if the user cannot see them
+        // Enrol user.
+        $plugin->enrol_user($plugininstance, $user->id, $plugininstance->roleid, $timestart, $timeend);
+        // Pass $view=true to filter hidden caps if the user cannot see them.
         if ($users = get_users_by_capability($context, 'moodle/course:update', 'u.*', 'u.id ASC',
             '', '', '', '', false, true)) {
             $users = sort_by_roleassignment_authority($users, $context);
@@ -260,9 +263,9 @@ if ($result) {
         }
 
 
-        if (is_enrolled($context, $user, '', true)) { // TODO: use real sslcommerz check
+        if (is_enrolled($context, $user, '', true)) { // TODO: use real sslcommerz check.
             redirect($destination, get_string('paymentthanks', '', $fullname));
-        } else {   /// Somehow they aren't enrolled yet!  :-(
+        } else {   // Somehow they aren't enrolled yet.
             $PAGE->set_url($destination);
             echo $OUTPUT->header();
             $a = new stdClass();
@@ -270,14 +273,14 @@ if ($result) {
             $a->fullname = $fullname;
             notice(get_string('paymentsorry', '', $a), $destination);
         }
-    } else { // status is something else
+    } else { // Status is something else.
 
         $data->payment_status = "Processing";
         $record = $DB->update_record("enrol_sslcommerz", $data, $bulk = false);
         $log = $DB->insert_record("enrol_sslcommerz_log", $data);
         redirect($destination, get_string('paymentinvalid', 'enrol_sslcommerz', $fullname));
     }
-} else {// ERROR
+} else { // ERROR.
     $data->payment_status = "Failed";
     $log = $DB->insert_record("enrol_sslcommerz_log", $data);
     throw new moodle_exception('erripninvalid', 'enrol_sslcommerz', '', null, json_encode($data));

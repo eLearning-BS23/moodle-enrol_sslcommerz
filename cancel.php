@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+//defined('MOODLE_INTERNAL') || die();
+require_login($course, true, $cm);
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once("$CFG->dirroot/enrol/sslcommerz/lib.php");
@@ -33,12 +35,12 @@ global $CFG, $USER;
 $courseid = required_param('id', PARAM_INT);
 
 $data = new stdClass();
-// check custom data requested from  ssl
+// Check custom data requested from ssl.
 if (empty($_POST['value_a'])) {
     throw new moodle_exception('invalidrequest', 'core_error', '', null, 'Missing request param: custom');
 }
 $custom = explode('-', $_POST['value_a']);
-//check custom data is valid
+// Check custom data is valid.
 if (empty($custom) || count($custom) < 3) {
     throw new moodle_exception('invalidrequest', 'core_error', '', null, 'Invalid value of the request param: custom');
 }
@@ -66,7 +68,7 @@ $context = context_course::instance($course->id, MUST_EXIST);
 
 $PAGE->set_context($context);
 
-//require_login();
+// ... require_login();.
 
 $params = array(
     'id' => $courseid
@@ -76,7 +78,7 @@ $url = new moodle_url(
     $params
 );
 
-//$PAGE->set_url($url);
+// ... $PAGE->set_url($url);.
 $PAGE->set_pagelayout('course');
 $PAGE->set_title($course->shortname . ': ' . get_string('pluginname', 'enrol_sslcommerz'));
 $PAGE->set_heading($course->fullname . ': ' . get_string('pluginname', 'enrol_sslcommerz'));

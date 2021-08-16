@@ -27,44 +27,63 @@ defined('MOODLE_INTERNAL') || die();
 
 if ($ADMIN->fulltree) {
 
-    //--- settings ------------------------------------------------------------------------------------------
-    $settings->add(new admin_setting_heading('enrol_sslcommerz_settings', '', get_string('pluginname_desc', 'enrol_sslcommerz')));
+    // Settings.
+    $settings->add(new admin_setting_heading('enrol_sslcommerz_settings', '',
+        get_string('pluginname_desc', 'enrol_sslcommerz')));
 
-    $settings->add(new admin_setting_configtext('enrol_sslcommerz/apiurl', get_string('apiurl', 'enrol_sslcommerz'), get_string('apiurl_desc', 'enrol_sslcommerz'), '', PARAM_TEXT));
-    $settings->add(new admin_setting_configtext('enrol_sslcommerz/requestedurl', get_string('requestedurl', 'enrol_sslcommerz'), get_string('requestedurl_desc', 'enrol_sslcommerz'), '', PARAM_TEXT));
+    $settings->add(new admin_setting_configtext('enrol_sslcommerz/apiurl',
+        get_string('apiurl', 'enrol_sslcommerz'),
+        get_string('apiurl_desc', 'enrol_sslcommerz'), '', PARAM_TEXT));
 
-    $settings->add(new admin_setting_configtext('enrol_sslcommerz/sslstoreid', get_string('businessstoreid', 'enrol_sslcommerz'), get_string('businessstoreid_desc', 'enrol_sslcommerz'), '', PARAM_TEXT));
+    $settings->add(new admin_setting_configtext('enrol_sslcommerz/requestedurl',
+        get_string('requestedurl', 'enrol_sslcommerz'),
+        get_string('requestedurl_desc', 'enrol_sslcommerz'), '', PARAM_TEXT));
 
-    $settings->add(new admin_setting_configtext('enrol_sslcommerz/sslstorepassword', get_string('businessstorepassword', 'enrol_sslcommerz'), get_string('businessstorepassword_desc', 'enrol_sslcommerz'), '', PARAM_TEXT));
+    $settings->add(new admin_setting_configtext('enrol_sslcommerz/sslstoreid',
+        get_string('businessstoreid', 'enrol_sslcommerz'),
+        get_string('businessstoreid_desc', 'enrol_sslcommerz'), '', PARAM_TEXT));
 
-    $settings->add(new admin_setting_configcheckbox('enrol_sslcommerz/mailstudents', get_string('mailstudents', 'enrol_sslcommerz'), '', 0));
+    $settings->add(new admin_setting_configtext('enrol_sslcommerz/sslstorepassword',
+        get_string('businessstorepassword', 'enrol_sslcommerz'),
+        get_string('businessstorepassword_desc', 'enrol_sslcommerz'), '', PARAM_TEXT));
 
-    $settings->add(new admin_setting_configcheckbox('enrol_sslcommerz/mailteachers', get_string('mailteachers', 'enrol_sslcommerz'), '', 0));
+    $settings->add(new admin_setting_configcheckbox('enrol_sslcommerz/mailstudents',
+        get_string('mailstudents', 'enrol_sslcommerz'), '', 0));
 
-    $settings->add(new admin_setting_configcheckbox('enrol_sslcommerz/mailadmins', get_string('mailadmins', 'enrol_sslcommerz'), '', 0));
+    $settings->add(new admin_setting_configcheckbox('enrol_sslcommerz/mailteachers',
+        get_string('mailteachers', 'enrol_sslcommerz'), '', 0));
+
+    $settings->add(new admin_setting_configcheckbox('enrol_sslcommerz/mailadmins',
+        get_string('mailadmins', 'enrol_sslcommerz'), '', 0));
 
     // Note: let's reuse the ext sync constants and strings here, internally it is very similar,
-    //       it describes what should happen when users are not supposed to be enrolled any more.
+    // it describes what should happen when users are not supposed to be enrolled any more.
     $options = array(
-        ENROL_EXT_REMOVED_KEEP           => get_string('extremovedkeep', 'enrol'),
+        ENROL_EXT_REMOVED_KEEP => get_string('extremovedkeep', 'enrol'),
         ENROL_EXT_REMOVED_SUSPENDNOROLES => get_string('extremovedsuspendnoroles', 'enrol'),
-        ENROL_EXT_REMOVED_UNENROL        => get_string('extremovedunenrol', 'enrol'),
+        ENROL_EXT_REMOVED_UNENROL => get_string('extremovedunenrol', 'enrol'),
     );
-    $settings->add(new admin_setting_configselect('enrol_sslcommerz/expiredaction', get_string('expiredaction', 'enrol_sslcommerz'), get_string('expiredaction_help', 'enrol_sslcommerz'), ENROL_EXT_REMOVED_SUSPENDNOROLES, $options));
+    $settings->add(new admin_setting_configselect('enrol_sslcommerz/expiredaction',
+        get_string('expiredaction', 'enrol_sslcommerz'),
+        get_string('expiredaction_help', 'enrol_sslcommerz'), ENROL_EXT_REMOVED_SUSPENDNOROLES, $options));
 
-    //--- enrol instance defaults ----------------------------------------------------------------------------
+    // Enrol instance defaults.
     $settings->add(new admin_setting_heading('enrol_sslcommerz_defaults',
         get_string('enrolinstancedefaults', 'admin'), get_string('enrolinstancedefaults_desc', 'admin')));
 
-    $options = array(ENROL_INSTANCE_ENABLED  => get_string('yes'),
-                     ENROL_INSTANCE_DISABLED => get_string('no'));
-    $settings->add(new admin_setting_configselect('enrol_sslcommerz/status',
-        get_string('status', 'enrol_sslcommerz'), get_string('status_desc', 'enrol_sslcommerz'), ENROL_INSTANCE_DISABLED, $options));
+    $options = array(ENROL_INSTANCE_ENABLED => get_string('yes'),
+        ENROL_INSTANCE_DISABLED => get_string('no'));
 
-    $settings->add(new admin_setting_configtext('enrol_sslcommerz/cost', get_string('cost', 'enrol_sslcommerz'), '', 0, PARAM_FLOAT, 4));
+    $settings->add(new admin_setting_configselect('enrol_sslcommerz/status',
+        get_string('status', 'enrol_sslcommerz'), get_string('status_desc', 'enrol_sslcommerz'),
+        ENROL_INSTANCE_DISABLED, $options));
+
+    $settings->add(new admin_setting_configtext('enrol_sslcommerz/cost',
+        get_string('cost', 'enrol_sslcommerz'), '', 0, PARAM_FLOAT, 4));
 
     $sslcommerzcurrencies = enrol_get_plugin('sslcommerz')->get_currencies();
-    $settings->add(new admin_setting_configselect('enrol_sslcommerz/currency', get_string('currency', 'enrol_sslcommerz'), '', 'USD', $sslcommerzcurrencies));
+    $settings->add(new admin_setting_configselect('enrol_sslcommerz/currency',
+        get_string('currency', 'enrol_sslcommerz'), '', 'USD', $sslcommerzcurrencies));
 
     if (!during_initial_install()) {
         $options = get_default_enrol_roles(context_system::instance());
@@ -78,5 +97,6 @@ if ($ADMIN->fulltree) {
     }
 
     $settings->add(new admin_setting_configduration('enrol_sslcommerz/enrolperiod',
-        get_string('enrolperiod', 'enrol_sslcommerz'), get_string('enrolperiod_desc', 'enrol_sslcommerz'), 0));
+        get_string('enrolperiod', 'enrol_sslcommerz'),
+        get_string('enrolperiod_desc', 'enrol_sslcommerz'), 0));
 }

@@ -22,7 +22,7 @@
  * @author     Brain station 23 ltd.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+require_login($course, true, $cm);
 defined('MOODLE_INTERNAL') || die();
 
 require("../../config.php");
@@ -34,59 +34,61 @@ require_once("$CFG->dirroot/enrol/sslcommerz/lib.php");
 /* PHP */
 $valid = urlencode($_POST['val_id']);
 $storeid = urlencode(get_config('enrol_sslcommerz')->sslstoreid);
-$store_passwd = urlencode(get_config('enrol_sslcommerz')->sslstorepassword);
-$requestedurl = ("https://sandbox.sslcommerz.com/validator/api/validationserverAPI.php?val_id=" . $valid . "&store_id=" . $storeid . "&store_passwd=" . $store_passwd . "&v=1&format=json");
+$storepasswd = urlencode(get_config('enrol_sslcommerz')->sslstorepassword);
+$requestedurl =
+    ("https://sandbox.sslcommerz.com/validator/api/validationserverAPI.php?val_id="
+        . $valid . "&store_id=" . $storeid . "&store_passwd=" . $storepasswd . "&v=1&format=json");
 $id = required_param('id', PARAM_INT);
 $userid = required_param('user_id', PARAM_INT);
-$instanceId = required_param('instance', PARAM_INT);
+$instanceid = required_param('instance', PARAM_INT);
 $handle = curl_init();
 curl_setopt($handle, CURLOPT_URL, $requestedurl);
 curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false); # IF YOU RUN FROM LOCAL PC
-curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false); # IF YOU RUN FROM LOCAL PC
+curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false); // IF YOU RUN FROM LOCAL PC.
+curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false); // IF YOU RUN FROM LOCAL PC.
 $result = curl_exec($handle);
 $code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 if ($code == 200 && !(curl_errno($handle))) {
-//    # TO CONVERT AS ARRAY
-//    # $result = json_decode($result, true);
-//    # $status = $result['status'];
-//
-//    # TO CONVERT AS OBJECT
+    // TO CONVERT AS ARRAY
+    // $result = json_decode($result, true);
+    // $status = $result['status'];
+    //
+    // TO CONVERT AS OBJECT.
     $result = json_decode($result);
 
-//    # TRANSACTION INFO
+    // TRANSACTION INFO.
     $status = $result->status;
-    $tran_date = $result->tran_date;
-    $tran_id = $result->tran_id;
+    $trandate = $result->tran_date;
+    $tranid = $result->tran_id;
     $valid = $result->val_id;
     $amount = $result->amount;
-    $store_amount = $result->store_amount;
+    $storeamount = $result->store_amount;
     $banktranid = $result->bank_tran_id;
     $cardtype = $result->card_type;
 
-//    # EMI INFO
-//    // $emi_ instalment = $result->emi_instalment;
-//    // $emi_ amount = $result->emi_ amount;
-//    // $emi_description = $result->emi_description;
-//    // $emi_issuer = $result->emi_issuer;
-//
-//    # ISSUER INFO
-    $card_no = $result->card_no;
-    $cardissuer = $result->card_issuer;
-    $card_brand = $result->card_brand;
-    $cardissuercountry = $result->card_issuer_country;
-    $cardissuercountry_code = $result->card_issuer_country_code;
+    // EMI INFO
+    // ... $emi_ instalment = $result->emi_instalment;.
+    // ... $emi_ amount = $result->emi_ amount;.
+    // ... $emi_description = $result->emi_description;.
+    // ... $emi_issuer = $result->emi_issuer;.
 
-//    # API AUTHENTICATION
-    $APIConnect = $result->APIConnect;
+    // ISSUER INFO
+    $cardno = $result->card_no;
+    $cardissuer = $result->card_issuer;
+    $cardbrand = $result->card_brand;
+    $cardissuercountry = $result->card_issuer_country;
+    $cardissuercountrycode = $result->card_issuer_country_code;
+
+    // API AUTHENTICATION.
+    $apiconnect = $result->APIConnect;
     $validatedon = $result->validated_on;
     $gwversion = $result->gw_version;
 
-// ALL CLEAR !
+    // ALL CLEAR.
 
     $data = new stdClass();
 
-// todo test foreach
+    // TODO: test foreach.
     foreach ($_POST as $key => $value) {
         if ($key !== clean_param($key, PARAM_ALPHANUMEXT)) {
             throw new moodle_exception('invalidrequest', 'core_error', '', null, $key);
@@ -107,7 +109,7 @@ if ($code == 200 && !(curl_errno($handle))) {
     $data->payment_status = $status;
     $data->userid = (int)$userid;
     $data->courseid = (int)$id;
-    $data->instanceid = (int)$instanceId;
+    $data->instanceid = (int)$instanceid;
     $data->mc_currency = $_POST['currency_type'];
     $data->timeupdated = time();
 
@@ -117,13 +119,14 @@ if ($code == 200 && !(curl_errno($handle))) {
 
     $PAGE->set_context($context);
 
-    $plugininstance = $DB->get_record("enrol", array("id" => $data->instanceid, "enrol" => "sslcommerz", "status" => 0), "*", MUST_EXIST);
+    $plugininstance =
+        $DB->get_record("enrol", array("id" => $data->instanceid, "enrol" => "sslcommerz", "status" => 0), "*", MUST_EXIST);
 
     $plugin = enrol_get_plugin('sslcommerz');
 
-    if (strcmp($status, "VALID") == 0) {          // VALID PAYMENT!
+    if (strcmp($status, "VALID") == 0) {          // VALID PAYMENT.
 
-        // check the payment_status and payment_reason
+        // Check the payment_status and payment_reason.
 
         // Make sure this transaction doesn't exist already.
         if ($existing = $DB->get_record("enrol_sslcommerz", array("txn_id" => $data->txn_id), "*", IGNORE_MULTIPLE)) {
@@ -140,26 +143,27 @@ if ($code == 200 && !(curl_errno($handle))) {
             $recipient = 'empty';
         }
 
+        /*
+        if (core_text::strtolower($recipient) !== core_text::strtolower($plugin->get_config('sslcommerzbusiness'))) {
+            \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Business email is {$recipient} (not ".
+                $plugin->get_config('sslcommerzbusiness').")", $data);
+            die;
+        }
+        */
 
-//        if (core_text::strtolower($recipient) !== core_text::strtolower($plugin->get_config('sslcommerzbusiness'))) {
-//            \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Business email is {$recipient} (not ".
-//                $plugin->get_config('sslcommerzbusiness').")", $data);
-//            die;
-//        }
-
-        if (!$user = $DB->get_record('user', array('id' => $data->userid))) {   // Check that user exists
+        if (!$user = $DB->get_record('user', array('id' => $data->userid))) {   // Check that user exists.
             \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("User $data->userid doesn't exist", $data);
             die;
         }
 
-        if (!$course = $DB->get_record('course', array('id' => $data->courseid))) { // Check that course exists
+        if (!$course = $DB->get_record('course', array('id' => $data->courseid))) { // Check that course exists.
             \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Course $data->courseid doesn't exist", $data);
             die;
         }
 
         $coursecontext = context_course::instance($course->id, IGNORE_MISSING);
 
-        // Check that amount paid is the correct amount
+        // Check that amount paid is the correct amount.
         if ((float)$plugininstance->cost <= 0) {
             $cost = (float)$plugin->get_config('cost');
         } else {
@@ -170,7 +174,7 @@ if ($code == 200 && !(curl_errno($handle))) {
         // Use the queried course's full name for the item_name field.
         $data->item_name = $course->fullname;
 
-        // ALL CLEAR !
+        // ALL CLEAR.
 
         $cost = format_float($cost, 2, false);
 
@@ -184,10 +188,10 @@ if ($code == 200 && !(curl_errno($handle))) {
             $timeend = 0;
         }
 
-        // Enrol user
+        // Enrol user.
         $plugin->enrol_user($plugininstance, $user->id, $plugininstance->roleid, $timestart, $timeend);
 
-        // Pass $view=true to filter hidden caps if the user cannot see them
+        // Pass $view=true to filter hidden caps if the user cannot see them.
         if ($users = get_users_by_capability($context, 'moodle/course:update', 'u.*', 'u.id ASC',
             '', '', '', '', false, true)) {
             $users = sort_by_roleassignment_authority($users, $context);
