@@ -23,7 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-//defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once("$CFG->dirroot/enrol/sslcommerz/lib.php");
@@ -48,7 +47,7 @@ $data->courseid = (int)$custom[1];
 $data->instanceid = (int)$custom[2];
 $data->payment_currency = $_POST['currency'];
 $data->timeupdated = time();
-$data->receiver_email =$USER->email;
+$data->receiver_email = $USER->email;
 $data->receiver_id = $USER->id;
 $data->payment_status = $_POST['status'];
 $course = $DB->get_record("course", array("id" => $data->courseid), "*", MUST_EXIST);
