@@ -25,7 +25,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-
+/**
+ * SSLCOMMERZ enrolment plugin tests.
+ *
+ * @copyright  2021 Brain station 23 ltd.
+ * @author     Brain station 23 ltd.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class enrol_sslcommerz_testcase extends advanced_testcase {
 
     public function test_basics() {
@@ -45,6 +51,11 @@ class enrol_sslcommerz_testcase extends advanced_testcase {
         $sslcommerzplugin->sync(new null_progress_trace());
     }
 
+    /**
+     * Enable Plugin.
+     *
+     * @return void
+     */
     protected function enable_plugin() {
         $enabled = enrol_get_plugins(true);
         $enabled['sslcommerz'] = true;
@@ -221,6 +232,11 @@ class enrol_sslcommerz_testcase extends advanced_testcase {
         $this->assertCount(1, $actions);
     }
 
+    /**
+     * Disable Plugin.
+     *
+     * @return void
+     */
     protected function disable_plugin() {
         $enabled = enrol_get_plugins(true);
         unset($enabled['sslcommerz']);

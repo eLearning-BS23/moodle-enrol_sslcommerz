@@ -65,21 +65,41 @@ class enrol_sslcommerz_plugin extends enrol_plugin {
         return array();
     }
 
+    /**
+     * Return a boolean value.
+     *
+     * @return bool
+     */
     public function roles_protected() {
         // Users with role assign cap may tweak the roles later.
         return false;
     }
 
+    /**
+     * Return a boolean value.
+     *
+     * @return bool
+     */
     public function allow_unenrol(stdClass $instance) {
         // Users with unenrol cap may unenrol other users manually - requires enrol/sslcommerz:unenrol.
         return true;
     }
 
+    /**
+     * Return a boolean value.
+     *
+     * @return bool
+     */
     public function allow_manage(stdClass $instance) {
         // Users with manage cap may tweak period and status - requires enrol/sslcommerz:manage.
         return true;
     }
 
+    /**
+     * Returns a boolean value
+     * @param stdClass
+     * @return bool
+     */
     public function show_enrolme_link(stdClass $instance) {
         return ($instance->status == ENROL_INSTANCE_ENABLED);
     }
@@ -252,6 +272,7 @@ class enrol_sslcommerz_plugin extends enrol_plugin {
      * @param stdClass $instance
      * @param int $oldinstancestatus
      * @param int $userid
+     * @return void
      */
     public function restore_user_enrolment(restore_enrolments_structure_step $step, $data, $instance, $userid, $oldinstancestatus) {
         $this->enrol_user($instance, $userid, null, $data->timestart, $data->timeend, $data->status);
@@ -318,6 +339,11 @@ class enrol_sslcommerz_plugin extends enrol_plugin {
         return $options;
     }
 
+    /**
+     * Return an array of valid currencies.
+     *
+     * @return array
+     */
     public function get_currencies() {
         $codes = array(
             'BDT');

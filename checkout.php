@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This script is used to configure and execute the course copy proccess.
+ * sslcommerz enrolment plugin - support for user self unenrolment.
  *
- * @package    core_backup
- * @copyright  2020 onward The Moodle Users Association <https://moodleassociation.org/>
- * @author     Matt Porritt <mattp@catalyst-au.net>
+ * @package    enrol_sslcommerz
+ * @copyright  2021 Brain station 23 ltd.
+ * @author     Brain station 23 ltd.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
