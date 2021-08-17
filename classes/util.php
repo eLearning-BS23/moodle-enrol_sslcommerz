@@ -18,7 +18,7 @@
  * sslcommerz enrolment plugin utility class.
  *
  * @package    enrol_sslcommerz
- * @copyright  2016 Cameron Ball <cameron@cameron1729.xyz>
+ * @copyright  2021 Brain station 23 ltd <>  {@link https://brainstation-23.com/}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  * sslcommerz enrolment plugin utility class.
  *
  * @package   enrol_sslcommerz
- * @copyright 2016 Cameron Ball <cameron@cameron1729.xyz>
+ * @copyright 2021 Brain station 23 ltd <>  {@link https://brainstation-23.com/}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class util {
@@ -38,8 +38,8 @@ final class util {
     /**
      * Alerts site admin of potential problems.
      *
-     * @param string   $subject email subject
-     * @param stdClass $data    sslcommerz IPN data
+     * @param string $subject email subject
+     * @param stdClass $data sslcommerz IPN data
      */
     public static function message_sslcommerz_error_to_admin($subject, $data) {
         $admin = get_admin();
@@ -52,17 +52,17 @@ final class util {
         }
 
         $eventdata = new \core\message\message();
-        $eventdata->courseid          = empty($data->courseid) ? SITEID : $data->courseid;
-        $eventdata->modulename        = 'moodle';
-        $eventdata->component         = 'enrol_sslcommerz';
-        $eventdata->name              = 'sslcommerz_enrolment';
-        $eventdata->userfrom          = $admin;
-        $eventdata->userto            = $admin;
-        $eventdata->subject           = "sslcommerz ERROR: ".$subject;
-        $eventdata->fullmessage       = $message;
+        $eventdata->courseid = empty($data->courseid) ? SITEID : $data->courseid;
+        $eventdata->modulename = 'moodle';
+        $eventdata->component = 'enrol_sslcommerz';
+        $eventdata->name = 'sslcommerz_enrolment';
+        $eventdata->userfrom = $admin;
+        $eventdata->userto = $admin;
+        $eventdata->subject = "sslcommerz ERROR: " . $subject;
+        $eventdata->fullmessage = $message;
         $eventdata->fullmessageformat = FORMAT_PLAIN;
-        $eventdata->fullmessagehtml   = '';
-        $eventdata->smallmessage      = '';
+        $eventdata->fullmessagehtml = '';
+        $eventdata->smallmessage = '';
         message_send($eventdata);
     }
 
@@ -72,12 +72,12 @@ final class util {
      * @return callable exception handler
      */
     public static function get_exception_handler() {
-        return function($ex) {
+        return function ($ex) {
             $info = get_exception_info($ex);
 
-            $logerrmsg = "enrol_sslcommerz IPN exception handler: ".$info->message;
+            $logerrmsg = "enrol_sslcommerz IPN exception handler: " . $info->message;
             if (debugging('', DEBUG_NORMAL)) {
-                $logerrmsg .= ' Debug: '.$info->debuginfo."\n".format_backtrace($info->backtrace, true);
+                $logerrmsg .= ' Debug: ' . $info->debuginfo . "\n" . format_backtrace($info->backtrace, true);
             }
             error_log($logerrmsg);
 

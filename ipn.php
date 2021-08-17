@@ -41,10 +41,10 @@ if (!enrol_is_enabled('sslcommerz')) {
     throw new moodle_exception('errdisabled', 'enrol_sslcommerz');
 }
 
-/// Read all the data from PayPal and get it ready for later;
-/// we expect only valid UTF-8 encoding, it is the responsibility
-/// of user to set it up properly in PayPal business account,
-/// it is documented in docs wiki.
+// Read all the data from PayPal and get it ready for later;
+// we expect only valid UTF-8 encoding, it is the responsibility
+// of user to set it up properly in PayPal business account
+// it is documented in docs wiki.
 
 $req = 'cmd=_notify-validate';
 
@@ -86,23 +86,24 @@ $context = context_course::instance($course->id, MUST_EXIST);
 
 $PAGE->set_context($context);
 
-$plugin_instance = $DB->get_record("enrol", array("id" => $data->instanceid, "enrol" => "sslcommerz", "status" => 0), "*", MUST_EXIST);
+$plugininstance =
+    $DB->get_record("enrol", array("id" => $data->instanceid, "enrol" => "sslcommerz", "status" => 0), "*", MUST_EXIST);
 $plugin = enrol_get_plugin('sslcommerz');
 
 
-/// Open a connection back to SSLCommerz to validate the data
+// Open a connection back to SSLCommerz to validate the data.
 
 
 $valid = urlencode($_POST['val_id']);
 $storeid = urlencode(get_config('enrol_sslcommerz')->sslstoreid);
 $storepasswd = urlencode(get_config('enrol_sslcommerz')->sslstorepassword);
-$requested_url = (get_config("enrol_sslcommerz")->requestedurl . "?val_id=" . $valid . "&store_id=" . $storeid . "&store_passwd=" . $storepasswd . "&v=1&format=json");
+$requestedurl = (get_config("enrol_sslcommerz")->requestedurl . "?val_id=" . $valid . "&store_id=" . $storeid . "&store_passwd=" . $storepasswd . "&v=1&format=json");
 
 $handle = curl_init();
-curl_setopt($handle, CURLOPT_URL, $requested_url);
+curl_setopt($handle, CURLOPT_URL, $requestedurl);
 curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false); # IF YOU RUN FROM LOCAL PC
-curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false); # IF YOU RUN FROM LOCAL PC
+curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false); // IF YOU RUN FROM LOCAL PC.
+curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false); // IF YOU RUN FROM LOCAL PC.
 
 $result = curl_exec($handle);
 
@@ -127,7 +128,7 @@ if ($result) {
 
     if (empty($_POST['amount']) || empty($_POST['currency'])) {
 
-        $plugin->unenrol_user($plugin_instance, $data->userid);
+        $plugin->unenrol_user($plugininstance, $data->userid);
         \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Invalid Information.",
             $data);
         die;
@@ -142,29 +143,30 @@ if ($result) {
         die;
     }
 
-    if (!$user = $DB->get_record('user', array('id' => $data->userid))) {   // Check that user exists
+    if (!$user = $DB->get_record('user', array('id' => $data->userid))) {   // Check that user exists.
         \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("User $data->userid doesn't exist", $data);
         redirect($destination, get_string('usermissing', 'enrol_sslcommerz', $data->userid));
         die;
     }
 
-    if (!$course = $DB->get_record('course', array('id' => $data->courseid))) { // Check that course exists
+    if (!$course = $DB->get_record('course', array('id' => $data->courseid))) { // Check that course exists.
         \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Course $data->courseid doesn't exist", $data);
         redirect($destination, get_string('coursemissing', 'enrol_sslcommerz', $data->courseid));
         die;
     }
 
-    if ((float)$plugin_instance->cost <= 0) {
+    if ((float)$plugininstance->cost <= 0) {
         $cost = (float)$plugin->get_config('cost');
     } else {
-        $cost = (float)$plugin_instance->cost;
+        $cost = (float)$plugininstance->cost;
     }
 
     // Use the same rounding of floats as on the enrol form.
     $cost = format_float($cost, 2, false);
 
     if ($result->amount < $cost) {
-        \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Amount paid is not enough ($data->payment_gross < $cost))", $data);
+        \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Amount paid is not enough ($data->payment_gross < $cost))",
+            $data);
         redirect($destination, get_string('paymendue', 'enrol_sslcommerz', $result->amount));
         die;
     }
@@ -177,7 +179,7 @@ if ($result) {
 
     switch ($result->status) {
         case 'VALID':
-            // check from existing record
+            // Check from existing record.
             if ($validation->payment_status == 'Pending') {
 
                 $data->id = $validation->id;
@@ -185,26 +187,26 @@ if ($result) {
                 $entry = $DB->update_record("enrol_sslcommerz", $data, $bulk = false);
                 $DB->insert_record("enrol_sslcommerz_log", $data, $bulk = false);
 
-                if ($plugin_instance->enrolperiod) {
+                if ($plugininstance->enrolperiod) {
                     $timestart = time();
-                    $timeend = $timestart + $plugin_instance->enrolperiod;
+                    $timeend = $timestart + $plugininstance->enrolperiod;
                 } else {
                     $timestart = 0;
                     $timeend = 0;
                 }
 
-                // Enrol user
-                $plugin->enrol_user($plugin_instance, $user->id, $plugin_instance->roleid, $timestart, $timeend);
+                // Enrol user.
+                $plugin->enrol_user($plugininstance, $user->id, $plugininstance->roleid, $timestart, $timeend);
 
 
                 $this->mailFuntion($context);
 
                 $fullname = format_string($course->fullname, true, array('context' => $context));
 
-                if (is_enrolled($context, $user, '', true)) { // TODO: use real sslcommerz check
+                if (is_enrolled($context, $user, '', true)) { // TODO: use real sslcommerz check.
                     echo "Payment Successful";
 
-                } else {   /// Somehow they aren't enrolled yet!  :-(
+                } else {   // Somehow they aren't enrolled yet.
                     echo "Payment was not valid";
                 }
             } else {
@@ -241,4 +243,3 @@ if ($result) {
     }
 
 }
-

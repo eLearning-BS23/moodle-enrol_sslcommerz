@@ -35,17 +35,6 @@ defined('MOODLE_INTERNAL') || die();
  */
 class enrol_sslcommerz_plugin extends enrol_plugin {
 
-    public function get_currencies() {
-        $codes = array(
-            'BDT');
-        $currencies = array();
-        foreach ($codes as $c) {
-            $currencies[$c] = new lang_string($c, 'core_currencies');
-        }
-
-        return $currencies;
-    }
-
     /**
      * Returns optional enrolment information icons.
      *
@@ -76,21 +65,41 @@ class enrol_sslcommerz_plugin extends enrol_plugin {
         return array();
     }
 
+    /**
+     * Return a boolean value.
+     *
+     * @return bool
+     */
     public function roles_protected() {
-        // users with role assign cap may tweak the roles later
+        // Users with role assign cap may tweak the roles later.
         return false;
     }
 
+    /**
+     * Return a boolean value.
+     *
+     * @return bool
+     */
     public function allow_unenrol(stdClass $instance) {
-        // users with unenrol cap may unenrol other users manually - requires enrol/sslcommerz:unenrol
+        // Users with unenrol cap may unenrol other users manually - requires enrol/sslcommerz:unenrol.
         return true;
     }
 
+    /**
+     * Return a boolean value.
+     *
+     * @return bool
+     */
     public function allow_manage(stdClass $instance) {
-        // users with manage cap may tweak period and status - requires enrol/sslcommerz:manage
+        // Users with manage cap may tweak period and status - requires enrol/sslcommerz:manage.
         return true;
     }
 
+    /**
+     * Returns a boolean value
+     * @param stdClass
+     * @return bool
+     */
     public function show_enrolme_link(stdClass $instance) {
         return ($instance->status == ENROL_INSTANCE_ENABLED);
     }
@@ -107,7 +116,7 @@ class enrol_sslcommerz_plugin extends enrol_plugin {
             return false;
         }
 
-        // multiple instances supported - different cost for different roles
+        // Multiple instances supported - different cost for different roles.
         return true;
     }
 
@@ -118,19 +127,6 @@ class enrol_sslcommerz_plugin extends enrol_plugin {
      */
     public function use_standard_editing_ui() {
         return true;
-    }
-
-    /**
-     * Add new instance of enrol plugin.
-     * @param object $course
-     * @param array $fields instance fields
-     * @return int id of new instance, null if can not be created
-     */
-    public function add_instance($course, array $fields = null) {
-        if ($fields && !empty($fields['cost'])) {
-            $fields['cost'] = unformat_float($fields['cost']);
-        }
-        return parent::add_instance($course, $fields);
     }
 
     /**
@@ -153,12 +149,12 @@ class enrol_sslcommerz_plugin extends enrol_plugin {
      * @param stdClass $instance
      * @return string html text, usually a form in a text box
      */
-    function enrol_page_hook(stdClass $instance) {
+    public function enrol_page_hook(stdClass $instance) {
         global $CFG, $USER, $OUTPUT, $PAGE, $DB;
 
         ob_start();
 
-        if ($DB->record_exists('user_enrolments', array('userid'=>$USER->id, 'enrolid'=>$instance->id))) {
+        if ($DB->record_exists('user_enrolments', array('userid' => $USER->id, 'enrolid' => $instance->id))) {
             return ob_get_clean();
         }
 
@@ -170,31 +166,31 @@ class enrol_sslcommerz_plugin extends enrol_plugin {
             return ob_get_clean();
         }
 
-        $course = $DB->get_record('course', array('id'=>$instance->courseid));
+        $course = $DB->get_record('course', array('id' => $instance->courseid));
         $context = context_course::instance($course->id);
 
         $shortname = format_string($course->shortname, true, array('context' => $context));
         $strloginto = get_string("loginto", "", $shortname);
         $strcourses = get_string("courses");
 
-        // Pass $view=true to filter hidden caps if the user cannot see them
+        // Pass $view=true to filter hidden caps if the user cannot see them.
         if ($users = get_users_by_capability($context, 'moodle/course:update', 'u.*', 'u.id ASC',
-                                             '', '', '', '', false, true)) {
+            '', '', '', '', false, true)) {
             $users = sort_by_roleassignment_authority($users, $context);
             $teacher = array_shift($users);
         } else {
             $teacher = false;
         }
 
-        if ( (float) $instance->cost <= 0 ) {
-            $cost = (float) $this->get_config('cost');
+        if ((float)$instance->cost <= 0) {
+            $cost = (float)$this->get_config('cost');
         } else {
-            $cost = (float) $instance->cost;
+            $cost = (float)$instance->cost;
         }
 
         if (abs($cost) < 0.01) {
-            // no cost, other enrolment methods (instances) should be used
-            echo '<p>'.get_string('nocost', 'enrol_sslcommerz').'</p>';
+            // No cost, other enrolment methods (instances) should be used.
+            echo '<p>' . get_string('nocost', 'enrol_sslcommerz') . '</p>';
         } else {
             // Calculate localised and "." cost, make sure we send sslcommerz the same value,
             // please note sslcommerz expects amount with 2 decimal places and "." separator.
@@ -202,24 +198,24 @@ class enrol_sslcommerz_plugin extends enrol_plugin {
             $cost = format_float($cost, 2, false);
 
             if (isguestuser()) {
-                // force login only for guest user, not real users with guest role
+                // Force login only for guest user, not real users with guest role.
                 $wwwroot = $CFG->wwwroot;
-                echo '<div class="mdl-align"><p>'.get_string('paymentrequired').'</p>';
-                echo '<p><b>'.get_string('cost').": $instance->currency $localisedcost".'</b></p>';
-                echo '<p><a href="'.$wwwroot.'/login/">'.get_string('loginsite').'</a></p>';
+                echo '<div class="mdl-align"><p>' . get_string('paymentrequired') . '</p>';
+                echo '<p><b>' . get_string('cost') . ": $instance->currency $localisedcost" . '</b></p>';
+                echo '<p><a href="' . $wwwroot . '/login/">' . get_string('loginsite') . '</a></p>';
                 echo '</div>';
             } else {
-                //Sanitise some fields before building the sslcommerz form
-                $coursefullname  = format_string($course->fullname, true, array('context'=>$context));
+                // Sanitise some fields before building the sslcommerz form.
+                $coursefullname = format_string($course->fullname, true, array('context' => $context));
                 $courseshortname = $shortname;
-                $userfullname    = fullname($USER);
-                $userfirstname   = $USER->firstname;
-                $userlastname    = $USER->lastname;
-                $useraddress     = $USER->address;
-                $usercity        = $USER->city;
-                $instancename    = $this->get_instance_name($instance);
+                $userfullname = fullname($USER);
+                $userfirstname = $USER->firstname;
+                $userlastname = $USER->lastname;
+                $useraddress = $USER->address;
+                $usercity = $USER->city;
+                $instancename = $this->get_instance_name($instance);
 
-                include($CFG->dirroot.'/enrol/sslcommerz/enrol.html');
+                include($CFG->dirroot . '/enrol/sslcommerz/enrol.html');
             }
         }
         return $OUTPUT->box(ob_get_clean());
@@ -239,11 +235,11 @@ class enrol_sslcommerz_plugin extends enrol_plugin {
             $merge = false;
         } else {
             $merge = array(
-                'courseid'   => $data->courseid,
-                'enrol'      => $this->get_name(),
-                'roleid'     => $data->roleid,
-                'cost'       => $data->cost,
-                'currency'   => $data->currency,
+                'courseid' => $data->courseid,
+                'enrol' => $this->get_name(),
+                'roleid' => $data->roleid,
+                'cost' => $data->cost,
+                'currency' => $data->currency,
             );
         }
         if ($merge and $instances = $DB->get_records('enrol', $merge, 'id')) {
@@ -256,6 +252,19 @@ class enrol_sslcommerz_plugin extends enrol_plugin {
     }
 
     /**
+     * Add new instance of enrol plugin.
+     * @param object $course
+     * @param array $fields instance fields
+     * @return int id of new instance, null if can not be created
+     */
+    public function add_instance($course, array $fields = null) {
+        if ($fields && !empty($fields['cost'])) {
+            $fields['cost'] = unformat_float($fields['cost']);
+        }
+        return parent::add_instance($course, $fields);
+    }
+
+    /**
      * Restore user enrolment.
      *
      * @param restore_enrolments_structure_step $step
@@ -263,38 +272,11 @@ class enrol_sslcommerz_plugin extends enrol_plugin {
      * @param stdClass $instance
      * @param int $oldinstancestatus
      * @param int $userid
+     * @return void
      */
     public function restore_user_enrolment(restore_enrolments_structure_step $step, $data, $instance, $userid, $oldinstancestatus) {
         $this->enrol_user($instance, $userid, null, $data->timestart, $data->timeend, $data->status);
     }
-
-    /**
-     * Return an array of valid options for the status.
-     *
-     * @return array
-     */
-    protected function get_status_options() {
-        $options = array(ENROL_INSTANCE_ENABLED  => get_string('yes'),
-                         ENROL_INSTANCE_DISABLED => get_string('no'));
-        return $options;
-    }
-
-    /**
-     * Return an array of valid options for the roleid.
-     *
-     * @param stdClass $instance
-     * @param context $context
-     * @return array
-     */
-    protected function get_roleid_options($instance, $context) {
-        if ($instance->id) {
-            $roles = get_default_enrol_roles($context, $instance->roleid);
-        } else {
-            $roles = get_default_enrol_roles($context, $this->get_config('roleid'));
-        }
-        return $roles;
-    }
-
 
     /**
      * Add elements to the edit instance form.
@@ -344,6 +326,49 @@ class enrol_sslcommerz_plugin extends enrol_plugin {
             $warningtext = get_string('instanceeditselfwarningtext', 'core_enrol');
             $mform->addElement('static', 'selfwarn', get_string('instanceeditselfwarning', 'core_enrol'), $warningtext);
         }
+    }
+
+    /**
+     * Return an array of valid options for the status.
+     *
+     * @return array
+     */
+    protected function get_status_options() {
+        $options = array(ENROL_INSTANCE_ENABLED => get_string('yes'),
+            ENROL_INSTANCE_DISABLED => get_string('no'));
+        return $options;
+    }
+
+    /**
+     * Return an array of valid currencies.
+     *
+     * @return array
+     */
+    public function get_currencies() {
+        $codes = array(
+            'BDT');
+        $currencies = array();
+        foreach ($codes as $c) {
+            $currencies[$c] = new lang_string($c, 'core_currencies');
+        }
+
+        return $currencies;
+    }
+
+    /**
+     * Return an array of valid options for the roleid.
+     *
+     * @param stdClass $instance
+     * @param context $context
+     * @return array
+     */
+    protected function get_roleid_options($instance, $context) {
+        if ($instance->id) {
+            $roles = get_default_enrol_roles($context, $instance->roleid);
+        } else {
+            $roles = get_default_enrol_roles($context, $this->get_config('roleid'));
+        }
+        return $roles;
     }
 
     /**

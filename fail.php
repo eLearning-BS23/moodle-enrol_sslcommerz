@@ -23,7 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
+require_login($course, true, $cm);
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 Srequire_once("$CFG->dirroot/enrol/sslcommerz/lib.php");
 
@@ -32,12 +32,12 @@ global $CFG, $USER;
 $courseid = required_param('id', PARAM_INT);
 
 $data = new stdClass();
-// check custom data requested from  ssl
+// Check custom data requested from  ssl.
 if (empty($_POST['value_a'])) {
     throw new moodle_exception('invalidrequest', 'core_error', '', null, 'Missing request param: custom');
 }
 $custom = explode('-', $_POST['value_a']);
-//check custom data is valid
+// Check custom data is valid.
 if (empty($custom) || count($custom) < 3) {
     throw new moodle_exception('invalidrequest', 'core_error', '', null, 'Invalid value of the request param: custom');
 }
@@ -46,7 +46,7 @@ $data->courseid = (int)$custom[1];
 $data->instanceid = (int)$custom[2];
 $data->payment_currency = $_POST['currency'];
 $data->timeupdated = time();
-$data->receiver_email =$USER->email;
+$data->receiver_email = $USER->email;
 $data->receiver_id = $USER->id;
 $data->payment_status = $_POST['status'];
 $course = $DB->get_record("course", array("id" => $data->courseid), "*", MUST_EXIST);
@@ -65,7 +65,7 @@ $context = context_course::instance($course->id, MUST_EXIST);
 
 $PAGE->set_context($context);
 
-//require_login();
+// ... require_login();
 
 $params = array(
     'id' => $courseid
@@ -76,7 +76,7 @@ $url = new moodle_url(
 );
 
 
-//$PAGE->set_url($url);
+// ... $PAGE->set_url($url);.
 $PAGE->set_pagelayout('course');
 $PAGE->set_title($course->shortname . ': ' . get_string('pluginname', 'enrol_sslcommerz'));
 $PAGE->set_heading($course->fullname . ': ' . get_string('pluginname', 'enrol_sslcommerz'));
@@ -91,7 +91,7 @@ echo $OUTPUT->header();
     <div class="col-md-8 offset-md-2">
         <?php
 
-        // Connect to database after confirming the request
+        // Connect to database after confirming the request.
         $tranid = trim($_POST['tran_id']);
 
         // First check if the POST request is real!
@@ -116,27 +116,27 @@ echo $OUTPUT->header();
                 </thead>
                 <tr>
                     <td class="text-right">Error</td>
-                    <td><?= $_POST['error'] ?></td>
+                    <td><?php echo $_POST['error'] ?></td>
                 </tr>
                 <tr>
                     <td class="text-right">Transaction ID</td>
-                    <td><?= $tranid ?></td>
+                    <td><?php echo $tranid ?></td>
                 </tr>
                 <tr>
                     <td class="text-right">Payment Method</td>
-                    <td><?= $_POST['card_issuer'] ?></td>
+                    <td><?php echo $_POST['card_issuer'] ?></td>
                 </tr>
                 <?php if ($_POST['bank_tran_id']) { ?>
                     <tr>
                         <td class="text-right">Bank Transaction Id</td>
-                        <td><?= $_POST['bank_tran_id'] ?></td>
+                        <td><?php echo $_POST['bank_tran_id'] ?></td>
                     </tr>
                 <?php }
                 ?>
 
                 <tr>
                     <td class="text-right"><b>Amount: </b></td>
-                    <td><?= $_POST['amount'] . ' ' . $_POST['currency'] ?></td>
+                    <td><?php echo $_POST['amount'] . ' ' . $_POST['currency'] ?></td>
                 </tr>
             </table>
             <h2 class="text-center text-danger">Error updating record: </h2> <?php echo $_POST['error']; ?>
@@ -150,23 +150,23 @@ echo $OUTPUT->header();
                 </thead>
                 <tr>
                     <td class="text-right">Transaction ID</td>
-                    <td><?= $tranid ?></td>
+                    <td><?php echo $tranid ?></td>
                 </tr>
                 <tr>
                     <td class="text-right">Transaction Time</td>
-                    <td><?= $_POST['tran_date'] ?></td>
+                    <td><?php echo $_POST['tran_date'] ?></td>
                 </tr>
                 <tr>
                     <td class="text-right">Payment Method</td>
-                    <td><?= $_POST['card_issuer'] ?></td>
+                    <td><?php echo $_POST['card_issuer'] ?></td>
                 </tr>
                 <tr>
                     <td class="text-right">Bank Transaction ID</td>
-                    <td><?= $_POST['bank_tran_id'] ?></td>
+                    <td><?php echo $_POST['bank_tran_id'] ?></td>
                 </tr>
                 <tr>
                     <td class="text-right">Amount</td>
-                    <td><?= $_POST['amount'] . ' ' . $_POST['currency'] ?></td>
+                    <td><?php echo $_POST['amount'] . ' ' . $_POST['currency'] ?></td>
                 </tr>
             </table>
         <?php endif ?>
