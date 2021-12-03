@@ -23,9 +23,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_login($course, true, $cm);
 require("../../config.php");
 global $CFG, $USER;
+require_login();
+
 /* PHP */
 
 $postdata = array();
