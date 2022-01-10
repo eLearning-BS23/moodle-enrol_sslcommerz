@@ -31,6 +31,13 @@ require_once("lib.php");
 require_once($CFG->libdir . '/enrollib.php');
 require_once($CFG->libdir . '/filelib.php');
 
+$courseid       = required_param('id', PARAM_INT);
+$value_a        = optional_param('custom', 0, PARAM_ALPHAEXT);
+$currency       = required_param('currency', PARAM_TEXT);
+$amount         = required_param('amount', PARAM_FLOAT);
+$val_id         = required_param('val_id', PARAM_INT);
+
+
 // PayPal does not like when we return error messages here,
 // the custom handler just logs exceptions and stops.
 set_exception_handler(\enrol_sslcommerz\util::get_exception_handler());
@@ -62,11 +69,11 @@ foreach ($_POST as $key => $value) {
     $data->$key = fix_utf8($value);
 }
 
-if (empty($_POST['value_a'])) {
+if (empty($value_a)) {
     throw new moodle_exception('invalidrequest', 'core_error', '', null, 'Missing request param: custom');
 }
 
-$custom = explode('-', $_POST['value_a']);
+$custom = explode('-', $value_a);
 
 
 if (empty($custom) || count($custom) < 3) {
@@ -94,7 +101,7 @@ $plugin = enrol_get_plugin('sslcommerz');
 // Open a connection back to SSLCommerz to validate the data.
 
 
-$valid = urlencode($_POST['val_id']);
+$valid = urlencode($val_id);
 $storeid = urlencode(get_config('enrol_sslcommerz')->sslstoreid);
 $storepasswd = urlencode(get_config('enrol_sslcommerz')->sslstorepassword);
 $requestedurl = (get_config("enrol_sslcommerz")->requestedurl . "?val_id=" . $valid . "&store_id=" . $storeid . "&store_passwd=" . $storepasswd . "&v=1&format=json");
@@ -123,10 +130,10 @@ if ($result) {
 
     $fullname = format_string($course->fullname, true, array('context' => $context));
 
-    $amount = $_POST['amount'];
-    $currency = $_POST['currency'];
+    $amount = $amount;
+    $currency = $currency;
 
-    if (empty($_POST['amount']) || empty($_POST['currency'])) {
+    if (empty($amount) || empty($currency)) {
 
         $plugin->unenrol_user($plugininstance, $data->userid);
         \enrol_sslcommerz\util::message_sslcommerz_error_to_admin("Invalid Information.",

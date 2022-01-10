@@ -29,14 +29,26 @@ Srequire_once("$CFG->dirroot/enrol/sslcommerz/lib.php");
 
 global $CFG, $USER;
 
-$courseid = required_param('id', PARAM_INT);
+$courseid       = required_param('id', PARAM_INT);
+$value_a        = optional_param('custom', 0, PARAM_ALPHAEXT);
+$currency       = required_param('currency', PARAM_TEXT);
+$amount         = required_param('amount', PARAM_FLOAT);
+$tran_id        = required_param('tran_id', PARAM_INT);
+$status         = required_param('status', PARAM_TEXT);
+$card_issuer    = required_param('card_issuer', PARAM_TEXT);
+$bank_tran_id   = required_param('bank_tran_id', PARAM_INT);
+$tran_date      = required_param('tran_date', PARAM_TEXT);
+
+
+
+$error          = optional_param('error', 0, PARAM_TEXT);
 
 $data = new stdClass();
 // Check custom data requested from  ssl.
-if (empty($_POST['value_a'])) {
+if (empty($value_a)) {
     throw new moodle_exception('invalidrequest', 'core_error', '', null, 'Missing request param: custom');
 }
-$custom = explode('-', $_POST['value_a']);
+$custom = explode('-', $value_a);
 // Check custom data is valid.
 if (empty($custom) || count($custom) < 3) {
     throw new moodle_exception('invalidrequest', 'core_error', '', null, 'Invalid value of the request param: custom');
@@ -44,17 +56,17 @@ if (empty($custom) || count($custom) < 3) {
 $data->userid = (int)$custom[0];
 $data->courseid = (int)$custom[1];
 $data->instanceid = (int)$custom[2];
-$data->payment_currency = $_POST['currency'];
+$data->payment_currency = $currency;
 $data->timeupdated = time();
 $data->receiver_email = $USER->email;
 $data->receiver_id = $USER->id;
-$data->payment_status = $_POST['status'];
+$data->payment_status = $status;
 $course = $DB->get_record("course", array("id" => $data->courseid), "*", MUST_EXIST);
 
 $data->item_name = $course->fullname;
 
 
-$validation = $DB->get_record('enrol_sslcommerz', array('txn_id' => $_POST['tran_id']));
+$validation = $DB->get_record('enrol_sslcommerz', array('txn_id' => $tran_id));
 
 $data->id = $validation->id;
 
@@ -92,7 +104,7 @@ echo $OUTPUT->header();
         <?php
 
         // Connect to database after confirming the request.
-        $tranid = trim($_POST['tran_id']);
+        $tranid = trim($tran_id);
 
         // First check if the POST request is real!
         if (empty($tranid) || empty($tranid)) {
@@ -101,7 +113,7 @@ echo $OUTPUT->header();
         }
 
 
-        if ($_POST['status'] == 'PENDING' || $_POST['status'] == 'FAILED') {
+        if ($status == 'PENDING' || $status == 'FAILED') {
 
 
             ?>
@@ -116,7 +128,7 @@ echo $OUTPUT->header();
                 </thead>
                 <tr>
                     <td class="text-right">Error</td>
-                    <td><?php echo $_POST['error'] ?></td>
+                    <td><?php echo $error ?></td>
                 </tr>
                 <tr>
                     <td class="text-right">Transaction ID</td>
@@ -124,24 +136,24 @@ echo $OUTPUT->header();
                 </tr>
                 <tr>
                     <td class="text-right">Payment Method</td>
-                    <td><?php echo $_POST['card_issuer'] ?></td>
+                    <td><?php echo $card_issuer ?></td>
                 </tr>
-                <?php if ($_POST['bank_tran_id']) { ?>
+                <?php if ($bank_tran_id) { ?>
                     <tr>
                         <td class="text-right">Bank Transaction Id</td>
-                        <td><?php echo $_POST['bank_tran_id'] ?></td>
+                        <td><?php echo $bank_tran_id ?></td>
                     </tr>
                 <?php }
                 ?>
 
                 <tr>
                     <td class="text-right"><b>Amount: </b></td>
-                    <td><?php echo $_POST['amount'] . ' ' . $_POST['currency'] ?></td>
+                    <td><?php echo $amount . ' ' . $currency; ?></td>
                 </tr>
             </table>
-            <h2 class="text-center text-danger">Error updating record: </h2> <?php echo $_POST['error']; ?>
+            <h2 class="text-center text-danger">Error updating record: </h2> <?php echo error; ?>
         <?php } ?>
-        <?php if ($_POST['status'] == 'PROCESSING') : ?>
+        <?php if ($status == 'PROCESSING') : ?>
             <table border="1" class="table table-striped">
                 <thead class="thead-dark">
                 <tr class="text-center">
@@ -154,19 +166,19 @@ echo $OUTPUT->header();
                 </tr>
                 <tr>
                     <td class="text-right">Transaction Time</td>
-                    <td><?php echo $_POST['tran_date'] ?></td>
+                    <td><?php echo $tran_date ?></td>
                 </tr>
                 <tr>
                     <td class="text-right">Payment Method</td>
-                    <td><?php echo $_POST['card_issuer'] ?></td>
+                    <td><?php echo $card_issuer ?></td>
                 </tr>
                 <tr>
                     <td class="text-right">Bank Transaction ID</td>
-                    <td><?php echo $_POST['bank_tran_id'] ?></td>
+                    <td><?php echo $bank_tran_id ?></td>
                 </tr>
                 <tr>
                     <td class="text-right">Amount</td>
-                    <td><?php echo $_POST['amount'] . ' ' . $_POST['currency'] ?></td>
+                    <td><?php echo $amount . ' ' . $currency ?></td>
                 </tr>
             </table>
         <?php endif ?>

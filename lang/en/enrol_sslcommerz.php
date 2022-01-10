@@ -106,4 +106,6 @@ $string['apiurl'] = 'Api Url';
 $string['requestedurl'] = 'Requested Url';
 $string['requestedurl_desc'] = 'Requested Url Without parameter';
 $string['course'] = 'Course';
+$string['productionenv'] = 'Production Environment';
+$string['productionenv_desc'] = 'Production Environment of SSLCommerz True/False';
 
