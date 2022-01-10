@@ -84,3 +84,12 @@ Dashboard->Courses->Course->Users->Enrolment methods->SSLCOMMERZ settings
 - That's it. and you are done!
 - Enjoy the plugin!
 
+## Author
+- [Brain Station 23 Ltd.](https://brainstation-23.com)
+
+## License
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program. If not, see [GNU License](http://www.gnu.org/licenses/).
