@@ -24,7 +24,6 @@ global $DB, $USER, $OUTPUT, $CFG, $PAGE;
 require_once(__DIR__ . "/configurations/lib/SslCommerzNotification.php");
 include_once(__DIR__ . "/configurations/OrderTransaction.php");
 
-var_dump($_POST); die();
 
     $instanceid = $_POST['value_d'];
     $userid = $_POST['value_a'];
