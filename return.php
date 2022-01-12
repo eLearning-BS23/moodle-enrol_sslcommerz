@@ -31,8 +31,21 @@ use mod_lti\local\ltiservice\response;
 
 global $CFG, $USER;
 require_once("$CFG->dirroot/enrol/sslcommerz/lib.php");
+
+$courseid       = required_param('id', PARAM_INT);
+$value_a        = optional_param('custom', 0, PARAM_ALPHAEXT);
+$currency       = required_param('currency', PARAM_TEXT);
+$currency_type  = required_param('currency_type', PARAM_TEXT);
+$amount         = required_param('amount', PARAM_FLOAT);
+$tran_id        = required_param('tran_id', PARAM_INT);
+$status         = required_param('status', PARAM_TEXT);
+$card_issuer    = required_param('card_issuer', PARAM_TEXT);
+$bank_tran_id   = required_param('bank_tran_id', PARAM_INT);
+$tran_date      = required_param('tran_date', PARAM_TEXT);
+$val_id         = required_param('val_id', PARAM_INT);
+
 /* PHP */
-$valid = urlencode($_POST['val_id']);
+$valid = urlencode($val_id);
 $storeid = urlencode(get_config('enrol_sslcommerz')->sslstoreid);
 $storepasswd = urlencode(get_config('enrol_sslcommerz')->sslstorepassword);
 $requestedurl =
@@ -103,14 +116,14 @@ if ($code == 200 && !(curl_errno($handle))) {
     $course = $DB->get_record("course", array("id" => $id), "*", MUST_EXIST);
 
     $data->receiver_email = $user->email;
-    $data->memo = $_POST['tran_id'];
-    $data->txn_id = $_POST['tran_id'];
+    $data->memo = $tran_id;
+    $data->txn_id = $tran_id;
     $data->payment_type = $cardtype;
     $data->payment_status = $status;
     $data->userid = (int)$userid;
     $data->courseid = (int)$id;
     $data->instanceid = (int)$instanceid;
-    $data->mc_currency = $_POST['currency_type'];
+    $data->mc_currency = $currency_type;
     $data->timeupdated = time();
 
 

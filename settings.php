@@ -47,6 +47,11 @@ if ($ADMIN->fulltree) {
         get_string('businessstorepassword', 'enrol_sslcommerz'),
         get_string('businessstorepassword_desc', 'enrol_sslcommerz'), '', PARAM_TEXT));
 
+    $settings->add(new admin_setting_configtext('enrol_sslcommerz/productionenv',
+        get_string('productionenv', 'enrol_sslcommerz'),
+        get_string('productionenv_desc', 'enrol_sslcommerz'), 'False', PARAM_TEXT));
+
+
     $settings->add(new admin_setting_configcheckbox('enrol_sslcommerz/mailstudents',
         get_string('mailstudents', 'enrol_sslcommerz'), '', 0));
 
