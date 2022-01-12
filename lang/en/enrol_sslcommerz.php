@@ -107,5 +107,6 @@ $string['requestedurl'] = 'Requested Url';
 $string['requestedurl_desc'] = 'Requested Url Without parameter';
 $string['course'] = 'Course';
 $string['productionenv'] = 'Production Environment';
-$string['productionenv_desc'] = 'Production Environment of SSLCommerz True/False';
-
+$string['productionenv_desc'] = 'Production Environment of #configurations True/False';
+$string['button_name'] = 'PAY NOW';
+$string['paymentpage'] = 'Payment Page';

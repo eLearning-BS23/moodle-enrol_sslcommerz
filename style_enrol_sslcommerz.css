@@ -1,0 +1,39 @@
+.paynowbutton {
+    position: relative;
+    background: #3498db;
+    border: 0 none;
+    color: #fff;
+    padding: 8px 20px 8px 70px;
+    border-radius: 4px;
+    height: 42px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-size: 13px;
+    width: 254px;
+    overflow: hidden;
+}
+.paynowbutton::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: #2a5da8 url(https://securepay.sslcommerz.com/stores/logos/z.png) no-repeat 90% 50%;;
+    width: 42px;
+    height: 100%;
+    box-sizing: border-box;
+    background-size: 70%;
+    border-radius: 4px 0px 0px 4px;
+    z-index: 9;
+}
+
+.paynowbutton::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top:0;
+    width: 54px;
+    height: 100%;
+    background: #2a5da8;
+    border-radius: 4px 0px 0px 4px;
+    transform: skewX(-25deg);
+}

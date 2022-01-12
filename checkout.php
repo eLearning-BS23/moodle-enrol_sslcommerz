@@ -27,7 +27,6 @@ require("../../config.php");
 global $CFG, $USER, $DB;
 require_login();
 
-
 $total_amount   = required_param('amount', PARAM_FLOAT);
 $currency       = required_param('currency_code', PARAM_TEXT);
 $course_id      = required_param('course_id', PARAM_ALPHAEXT);
@@ -46,6 +45,22 @@ $value_b = optional_param('course_id', 0, PARAM_INT);
 $value_c = optional_param('user_id', 0, PARAM_INT);
 $value_d = optional_param('instance_id', 0, PARAM_INT);
 
+//static data
+$post_data["previous_customer"] = "Yes";
+$post_data["shipping_method"] = "online";
+$post_data["num_of_item"] = "1";
+$post_data["product_shipping_contry"] = "Bangladesh";
+$post_data["vip_customer"] = "YES";
+$post_data["hours_till_departure"] = "12 hrs";
+$post_data["flight_type"] = "Oneway";
+$post_data["journey_from_to"] = "DAC-CGP";
+$post_data["third_party_booking"] = "No";
+
+$post_data["hotel_name"] = "Sheraton";
+$post_data["length_of_stay"] = "2 days";
+$post_data["check_in_time"] = "24 hrs";
+$post_data["hotel_city"] = "Dhaka";
+
 
 /* PHP */
 
@@ -59,7 +74,6 @@ $productionenv = $postdata['productionenv'];
 if($productionenv == "") {
     $productionenv = false;
 }
-//var_dump($productionenv); die();
 
 $postdata['tran_id'] = "MD_COURSE_" . uniqid();
 
@@ -75,8 +89,6 @@ $postdata['cus_postcode'] = "1000";
 $postdata['cus_phone'] = "";
 $postdata['cus_fax'] = "";
 
-
-
 $data = new stdClass();
 
 $data->userid = $user_id;
@@ -88,7 +100,6 @@ $data->txn_id = $postdata['tran_id'];
 $data->timeupdated = time();
 
 $DB->insert_record("enrol_sslcommerz", $data);
-
 
 // REQUEST SEND TO SSLCOMMERZ.
 $directapiurl = get_config("enrol_sslcommerz")->apiurl;
@@ -103,7 +114,7 @@ curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, $productionenv); // KEEP IT FALSE IF YOU RUN FROM LOCAL PC.
 
 $content = curl_exec($handle);
-$code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+$code    = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 if ($code == 200 && !(curl_errno($handle))) {
     curl_close($handle);
     $sslcommerzresponse = $content;
@@ -114,6 +125,7 @@ if ($code == 200 && !(curl_errno($handle))) {
 }
 // PARSE THE JSON RESPONSE.
 $sslcz = json_decode($sslcommerzresponse, true);
+
 if (isset($sslcz['GatewayPageURL']) && $sslcz['GatewayPageURL'] != "") {
     // THERE ARE MANY WAYS TO REDIRECT - Javascript, Meta Tag or Php Header Redirect or Other
     // echo "<script>window.location.href = '". $sslcz['GatewayPageURL'] ."';</script>";
@@ -123,3 +135,17 @@ if (isset($sslcz['GatewayPageURL']) && $sslcz['GatewayPageURL'] != "") {
 } else {
     echo "JSON Data parsing error!";
 }
+
+
+
+# First, save the input data into local database table `orders`
+//$query = new OrderTransaction();
+//$sql = $query->saveTransactionQuery($post_data);
+//
+//if ($DB->execute($sql)) {
+//    # Call the Payment Gateway Library
+//    $sslcomz = new SslCommerzNotification();
+//    $sslcomz->makePayment($post_data, 'hosted');
+//} else {
+//    echo "Error: " . $sql . "<br> Database connection Error";
+//}

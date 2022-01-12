@@ -43,7 +43,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Enrol SSLCommerz upgrade function.
+ * Enrol #configurations upgrade function.
  * @param string $oldversion the version we are upgrading from.
  */
 function xmldb_enrol_sslcommerz_upgrade($oldversion) {

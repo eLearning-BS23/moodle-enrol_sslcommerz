@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'enrol_sslcommerz';    // Full name of the plugin (used for diagnostics).
-$plugin->version = 2021081702;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->version = 2022011102;        // The current plugin version (Date: YYYYMMDDXX).
 $plugin->release = '1.0.2';
 $plugin->requires = 2020061509;        // Requires this Moodle version.
 $plugin->maturity = MATURITY_STABLE;

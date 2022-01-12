@@ -23,11 +23,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_login($course, true, $cm);
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 Srequire_once("$CFG->dirroot/enrol/sslcommerz/lib.php");
 
-global $CFG, $USER;
+global $CFG, $USER, $DB, $OUTPUT;
 
 $courseid       = required_param('id', PARAM_INT);
 $value_a        = optional_param('custom', 0, PARAM_ALPHAEXT);
