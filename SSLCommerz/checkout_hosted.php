@@ -34,7 +34,7 @@ require_once(__DIR__ . "/lib/SslCommerzNotification.php");
 
 include("OrderTransaction.php");
 
-use SSLCommerz\SslCommerzNotification;
+use SslCommerz\SslCommerzNotification;
 
 global $DB,$USER;
 

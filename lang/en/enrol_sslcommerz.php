@@ -30,7 +30,7 @@ $string['businessstorepassword'] = 'Store Password';
 $string['businessemail_desc'] = 'The email address of your business sslcommerz account';
 $string['businessstoreid_desc'] = 'The Store Id Provided from sslcommerz';
 $string['businessstorepassword_desc'] = 'The Store Password Provided from sslcommerz';
-$string['cost'] = 'Enrolment cost';
+$string['cost'] = 'Enrol cost';
 $string['costerror'] = 'The enrolment cost is not numeric';
 $string['costorkey'] = 'Please choose one of the following methods of enrolment.';
 $string['currency'] = 'Currency';
@@ -110,10 +110,3 @@ $string['productionenv'] = 'Production Environment';
 $string['productionenv_desc'] = 'Production Environment of #SSLCommerz True/False';
 $string['button_name'] = 'PAY NOW';
 $string['paymentpage'] = 'Payment Page';
-$string['paynowbutton_desc'] = 'You have to make a payment to get enrolled in the course';
-
-$string['paynowbutton_desc'] = 'You have to make a payment to get enrolled in the course';
-$string['refer_desc'] = 'This course has refer enabled. You can use your referral points/BDT or referral code to get a discount!';
-$string['referlabel'] = 'Enter your referral code';
-
-

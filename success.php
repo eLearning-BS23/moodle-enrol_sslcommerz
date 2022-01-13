@@ -19,7 +19,6 @@ require_once("../../config.php");
 
 
 use SslCommerz\SslCommerzNotification;
-
 global $DB, $USER, $OUTPUT, $CFG, $PAGE;
 
 require_once(__DIR__ . "/SSLCommerz/lib/SslCommerzNotification.php");
@@ -29,7 +28,6 @@ include_once(__DIR__ . "/SSLCommerz/OrderTransaction.php");
     $instanceid = $_POST['value_d'];
     $userid = $_POST['value_a'];
     $courseid =  $_POST['value_c'];
-    $currency_type = $_POST['currency_type'];
 
     $plugin = enrol_get_plugin('sslcommerz');
     $plugininstance= $DB->get_record("enrol", array("id" => $instanceid, "enrol" => "sslcommerz", "status" => 0));
@@ -44,11 +42,11 @@ include_once(__DIR__ . "/SSLCommerz/OrderTransaction.php");
     $row = $DB->get_record_sql($sql);
 
     if ($row->payment_status == 'Pending' || $row->payment_status == 'Processing') {
-        $sql = $ot->updateTransactionQuery($tran_id, 'Processing', $currency_type);
+        $sql = $ot->updateTransactionQuery($tran_id, 'Processing');
         $DB->execute($sql);
         $url = new moodle_url('/course/view.php?id='. $courseid);
-//        redirect($url);
-        redirect($url, 'successful payment', null, \core\output\notification::NOTIFY_SUCCESS);
+        redirect($url);
+
     }
 
 

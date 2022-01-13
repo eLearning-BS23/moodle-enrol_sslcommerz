@@ -32,7 +32,6 @@ class OrderTransaction {
         return $sql;
     }
 
-
     public function saveTransactionQuery($post_data)
     {
 
@@ -59,10 +58,10 @@ class OrderTransaction {
         return $sql;
     }
 
-    public function updateTransactionQuery($tran_id, $type = 'Success', $currency_type)
+    public function updateTransactionQuery($tran_id, $type = 'Success')
     {
 
-        $sql = "UPDATE {enrol_sslcommerz} SET payment_status='$type', payment_type='$currency_type' WHERE txn_id ='$tran_id'";
+        $sql = "UPDATE {enrol_sslcommerz} SET payment_status='$type' WHERE txn_id ='$tran_id'";
 
         return $sql;
     }
