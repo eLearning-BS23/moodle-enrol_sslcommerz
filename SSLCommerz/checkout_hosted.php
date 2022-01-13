@@ -34,7 +34,7 @@ require_once(__DIR__ . "/lib/SslCommerzNotification.php");
 
 include("OrderTransaction.php");
 
-use SslCommerz\SslCommerzNotification;
+use SSLCommerz\SslCommerzNotification;
 
 global $DB,$USER;
 
@@ -165,7 +165,6 @@ if ($DB->execute($sql)) {
     # Call the Payment Gateway Library
     $sslcomz = new SslCommerzNotification();
     $sslcomz->makePayment($post_data, 'hosted');
-
 
 } else {
     echo "Error: " . $sql . "<br> Database connection Error";

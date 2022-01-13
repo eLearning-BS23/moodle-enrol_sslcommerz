@@ -19,10 +19,11 @@ require_once("../../config.php");
 
 
 use SslCommerz\SslCommerzNotification;
+
 global $DB, $USER, $OUTPUT, $CFG, $PAGE;
 
-require_once(__DIR__ . "/configurations/lib/SslCommerzNotification.php");
-include_once(__DIR__ . "/configurations/OrderTransaction.php");
+require_once(__DIR__ . "/SSLCommerz/lib/SslCommerzNotification.php");
+include_once(__DIR__ . "/SSLCommerz/OrderTransaction.php");
 
 
     $instanceid = $_POST['value_d'];

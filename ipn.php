@@ -98,7 +98,7 @@ $plugininstance =
 $plugin = enrol_get_plugin('sslcommerz');
 
 
-// Open a connection back to #configurations to validate the data.
+// Open a connection back to #SSLCommerz to validate the data.
 
 
 $valid = urlencode($val_id);

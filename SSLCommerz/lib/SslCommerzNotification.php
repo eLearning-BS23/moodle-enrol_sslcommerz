@@ -308,9 +308,9 @@ class SslCommerzNotification extends AbstractSslCommerz
 
     public function setRequiredInfo(array $info)
     {
-        $this->data['total_amount'] = $info['total_amount']; // decimal (10,2)	Mandatory - The amount which will process by configurations. It shall be decimal value (10,2). Example : 55.40. The transaction amount must be from 10.00 BDT to 500000.00 BDT
+        $this->data['total_amount'] = $info['total_amount']; // decimal (10,2)	Mandatory - The amount which will process by SSLCommerz. It shall be decimal value (10,2). Example : 55.40. The transaction amount must be from 10.00 BDT to 500000.00 BDT
         $this->data['currency'] = $info['currency']; // string (3)	Mandatory - The currency type must be mentioned. It shall be three characters. Example : BDT, USD, EUR, SGD, INR, MYR, etc. If the transaction currency is not BDT, then it will be converted to BDT based on the current convert rate. Example : 1 USD = 82.22 BDT.
-        $this->data['tran_id'] = $info['tran_id']; // string (30)	Mandatory - Unique transaction ID to identify your order in both your end and configurations
+        $this->data['tran_id'] = $info['tran_id']; // string (30)	Mandatory - Unique transaction ID to identify your order in both your end and SSLCommerz
         $this->data['product_category'] = $info['product_category']; // string (50)	Mandatory - Mention the product category. It is a open field. Example - clothing,shoes,watches,gift,healthcare, jewellery,top up,toys,baby care,pants,laptop,donation,etc
 
         // Set the SUCCESS, FAIL, CANCEL and IPN URL before setting the other parameters
@@ -335,7 +335,7 @@ class SslCommerzNotification extends AbstractSslCommerz
 
         /*
          * Type: string (30)
-         * Do not Use! If you do not customize the gateway list - You can control to display the gateway list at configurations gateway selection page by providing this parameters.
+         * Do not Use! If you do not customize the gateway list - You can control to display the gateway list at SSLCommerz gateway selection page by providing this parameters.
          * Multi Card:
             brac_visa = BRAC VISA
             dbbl_visa = Dutch Bangla VISA
@@ -387,7 +387,7 @@ class SslCommerzNotification extends AbstractSslCommerz
     public function setCustomerInfo(array $info)
     {
         $this->data['cus_name'] = $info['cus_name']; // string (50)	Mandatory - Your customer name to address the customer in payment receipt email
-        $this->data['cus_email'] = $info['cus_email']; // string (50)	Mandatory - Valid email address of your customer to send payment receipt from configurations end
+        $this->data['cus_email'] = $info['cus_email']; // string (50)	Mandatory - Valid email address of your customer to send payment receipt from SSLCommerz end
         $this->data['cus_add1'] = $info['cus_add1']; // string (50)	Mandatory - Address of your customer. Not mandatory but useful if provided
         $this->data['cus_add2'] = $info['cus_add2']; // string (50)	Address line 2 of your customer. Not mandatory but useful if provided
         $this->data['cus_city'] = $info['cus_city']; // string (50)	Mandatory - City of your customer. Not mandatory but useful if provided
