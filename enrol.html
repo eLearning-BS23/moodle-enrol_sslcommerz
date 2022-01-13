@@ -1,5 +1,17 @@
 <h3><?php print_string("paymentrequired") ?></h3>
 <p><b><?php echo get_string('cost', 'enrol_sslcommerz').": {$instance->currency} {$localisedcost}"; ?></b></p>
+<!--<h5><b>-->
+<!--<?php-->
+<!--    echo get_string('refer_desc','enrol_sslcommerz');-->
+<!--?>-->
+<!--</b></h5>-->
+<!--<div>-->
+<!--    <form action="" method="POST">-->
+
+<!--    <button class="btn btn-primary" type="submit"><?php echo get_string('referlabel', 'enrol_sslcommerz');?></button>-->
+<!--    </form>-->
+<!--</div>-->
+
 <p><?php print_string("paymentinstant") ?></p>
 
 <div class="container">
@@ -17,7 +29,7 @@
                  <input type="hidden" class="form-control" id="address" name="customer_address"
                            value="<?php echo $USER->address; ?>">
                  <input type="hidden" name="customer_country" value="<?php echo $USER->country; ?>">
-                 <input type="hidden" name="state" value="<?php echo $USER->state; ?>">
+                 <input type="hidden" name="state" value="<?php echo $USER->city; ?>">
 
                 <input type="hidden" value="<?=p($cost) ?>" name="amount" id="total_amount" required/>
                 <input type="hidden" value="<?php echo $category->name; ?>" name="categoryname" id="categoryname" required/>
@@ -44,7 +56,7 @@
                 <input type="hidden" name="no_shipping" value="1" />
                 <input type="hidden" name="rm" value="2" />
                 <input type="hidden" name="cbt" value="<?php print_string("continuetocourse") ?>" />
-                
+
                 <button class="paynowbutton" type="submit"><?php echo get_string('button_name', 'enrol_sslcommerz')?></button>
             </form>
         </div>
@@ -57,19 +69,9 @@
     ?>
 </style>
 
-    <script>
-        (function (window, document) {
-            var loader = function () {
-                var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
-                script.src = "https://sandbox.sslcommerz.com/embed.min.js?" + Math.random().toString(36).substring(7);
-                tag.parentNode.insertBefore(script, tag);
-            };
-
-            window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
-        })(window, document);
-    </script>
     <?php
 
 
 echo html_writer::end_div();
 
+?>

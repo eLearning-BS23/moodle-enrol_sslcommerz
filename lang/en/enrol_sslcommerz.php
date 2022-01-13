@@ -111,3 +111,9 @@ $string['productionenv_desc'] = 'Production Environment of #configurations True/
 $string['button_name'] = 'PAY NOW';
 $string['paymentpage'] = 'Payment Page';
 $string['paynowbutton_desc'] = 'You have to make a payment to get enrolled in the course';
+
+$string['paynowbutton_desc'] = 'You have to make a payment to get enrolled in the course';
+$string['refer_desc'] = 'This course has refer enabled. You can use your referral points/BDT or referral code to get a discount!';
+$string['referlabel'] = 'Enter your referral code';
+
+

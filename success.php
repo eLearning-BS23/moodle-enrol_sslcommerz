@@ -46,8 +46,8 @@ include_once(__DIR__ . "/configurations/OrderTransaction.php");
         $sql = $ot->updateTransactionQuery($tran_id, 'Processing', $currency_type);
         $DB->execute($sql);
         $url = new moodle_url('/course/view.php?id='. $courseid);
-        redirect($url);
-
+//        redirect($url);
+        redirect($url, 'successful payment', null, \core\output\notification::NOTIFY_SUCCESS);
     }
 
 
