@@ -47,8 +47,8 @@ $customer_state     = optional_param('customer_state', '', PARAM_TEXT);
 $customer_zip       = optional_param('customer_zip', '', PARAM_TEXT);
 $customer_mobile    = required_param('customer_mobile', PARAM_TEXT);
 $customer_country   = required_param('customer_country', PARAM_TEXT);
-$categoryname       = required_param('categoryname', PARAM_TEXT);
-$categoryid         = required_param('categoryid', PARAM_INT);
+$coursename       = required_param('coursename', PARAM_TEXT);
+//$categoryid         = required_param('categoryid', PARAM_INT);
 $amount             = required_param('amount', PARAM_FLOAT);
 $courseid           = required_param('course_id', PARAM_INT);
 $instance_id        = required_param('instance_id', PARAM_INT);
@@ -85,7 +85,7 @@ $post_data['ship_country'] = "Bangladesh";
 
 # OPTIONAL PARAMETERS
 $post_data['value_a'] = $USER->id;
-$post_data['value_b'] = isset($categoryid) ? $categoryid : "";
+$post_data['value_b'] = isset($courseid) ? $courseid : "";
 
 $post_data['value_c'] = $courseid;
 $post_data['value_d'] = $instance_id;
@@ -111,35 +111,14 @@ $schedule = array(
 # IT Will Return Transaction History
 # IT Will Return Saved Card- Set Default and delete Option
 
-$post_data["firstName"] = isset($customer_name) ? $customer_name : "John Doe";
-$post_data["lastName"] = "";
-$post_data["street"] = isset($customer_address) ? $customer_address : "";
-$post_data["city"] = isset($customer_state) ? $customer_state : "";
-$post_data["state"] = isset($customer_state) ? $customer_state : "";
-$post_data["postalCode"] = isset($customer_zip) ? $customer_zip : "";
-$post_data["country"] = isset($customer_country) ? $_POST['customer_country'] : "";
-$post_data["email"] = isset($customer_email) ? $customer_email : "";
 
-$post_data["product_category"] = isset($categoryid) ? $categoryid : "";
-$post_data["product_name"] = isset($categoryname) ? $categoryname : "";
-$post_data["previous_customer"] = "Yes";
+$post_data["product_category"] = "Course";
+$post_data["product_name"] =$coursename ?? 'course name' ;
+
 $post_data["shipping_method"] = "online";
 $post_data["num_of_item"] = "1";
-$post_data["product_shipping_contry"] = "Bangladesh";
-$post_data["vip_customer"] = "YES";
-$post_data["hours_till_departure"] = "12 hrs";
-$post_data["flight_type"] = "Oneway";
-$post_data["journey_from_to"] = "DAC-CGP";
-$post_data["third_party_booking"] = "No";
-
-$post_data["hotel_name"] = "Sheraton";
-$post_data["length_of_stay"] = "2 days";
-$post_data["check_in_time"] = "24 hrs";
-$post_data["hotel_city"] = "Dhaka";
-
 $post_data["product_type"] = "Prepaid";
-$post_data["phone_number"] = isset($customer_mobile) ? $customer_mobile : "";
-$post_data["country_topUp"] = "Bangladesh";
+
 
 # SPECIAL PARAM
 $post_data['tokenize_id'] = "1";
@@ -154,6 +133,7 @@ $post_data["product_profile"] = "general";
 $post_data["product_profile_id"] = "5";
 
 $post_data["topup_number"] = isset($customer_mobile) ? $customer_mobile : ""; # topUpNumber
+
 
 # First, save the input data into local database table `orders`
 $query = new OrderTransaction();

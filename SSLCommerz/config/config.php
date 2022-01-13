@@ -2,24 +2,26 @@
 
 global $CFG;
 
+define('STORE_ID', get_config('enrol_sslcommerz')->sslstoreid);
+define('API_DOMAIN_URL', get_config('enrol_sslcommerz')->apiurl);
+define('PROJECT_PATH', $CFG->wwwroot.'/enrol/sslcommerz');
+define('STORE_PASSWORD', get_config('enrol_sslcommerz')->sslstorepassword);
+
+
 if (!defined('PROJECT_PATH')) {
-//    define('PROJECT_PATH', 'http://localhost/moodle_var311/enrol/sslcommerz'); // Replace this value with your project path
-    define('PROJECT_PATH', $CFG->wwwroot.'/enrol/sslcommerz');
+    define('PROJECT_PATH', 'http://localhost/moodle311/enrol/sslcommerz'); // Replace this value with your project path
 }
 
 if (!defined('API_DOMAIN_URL')) {
-//    define('API_DOMAIN_URL', 'https://sandbox.sslcommerz.com');
-    define('API_DOMAIN_URL', get_config('enrol_sslcommerz')->apiurl);
+    define('API_DOMAIN_URL', 'https://sandbox.sslcommerz.com');
 }
 
 if (!defined('STORE_ID')) {
-//    define('STORE_ID', 'testc6102440fded2f');
-    define('STORE_ID', get_config('enrol_sslcommerz')->sslstoreid);
+    define('STORE_ID', 'testc6102440fded2f');
 }
 
 if (!defined('STORE_PASSWORD')) {
-//    define('STORE_PASSWORD', 'testc6102440fded2f@ssl');
-    define('STORE_PASSWORD', get_config('enrol_sslcommerz')->sslstorepassword);
+    define('STORE_PASSWORD', 'testc6102440fded2f@ssl');
 
 }
 

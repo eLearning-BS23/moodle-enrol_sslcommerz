@@ -228,6 +228,7 @@ class SslCommerzNotification extends AbstractSslCommerz
         $formattedResponse = $this->formatResponse($response, $type, $pattern); // Here we will define the response pattern
 
         if ($type == 'hosted') {
+
             if (isset($formattedResponse['GatewayPageURL']) && $formattedResponse['GatewayPageURL'] != '') {
                 $this->redirect($formattedResponse['GatewayPageURL']);
             } else {
