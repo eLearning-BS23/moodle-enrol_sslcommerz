@@ -17,7 +17,7 @@
                  <input type="hidden" class="form-control" id="address" name="customer_address"
                            value="<?php echo $USER->address; ?>">
                  <input type="hidden" name="customer_country" value="<?php echo $USER->country; ?>">
-                 <input type="hidden" name="state" value="<?php echo $USER->state; ?>">
+                 <input type="hidden" name="state" value="<?php echo $USER->state ?? ""; ?>">
 
                 <input type="hidden" value="<?=p($cost) ?>" name="amount" id="total_amount" required/>
                 <input type="hidden" value="<?php echo $course->fullname; ?>" name="coursename" id="coursename" required/>
